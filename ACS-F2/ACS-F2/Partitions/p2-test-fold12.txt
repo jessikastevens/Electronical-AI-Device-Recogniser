@@ -1,0 +1,46 @@
+Protocol 2 ; version 1 ; Test ; Fold 12
+Model TV (LCD / LED) 2
+	dz_tv_Philips_a1
+	dz_tv_Philips_a2
+Model Coffee machine 2
+	ar_coffeemachine_SuperMatik_P01HS_a1
+	ar_coffeemachine_SuperMatik_P01HS_a2
+Model Computer station (with monitor) 2
+	dz_computer-monitor_Dell03_a1
+	dz_computer-monitor_Dell03_a2
+Model Fan 2
+	ar_fan_Howell_HT43_a1
+	ar_fan_Howell_HT43_a2
+Model Fridge / Freezer 2
+	dg_freezer_Siemens_a1
+	dg_freezer_Siemens_a2
+Model Hi-Fi system (with CD player) 2
+	cg_hifi_Nad_C355-C565_a1
+	cg_hifi_Nad_C355-C565_a2
+Model Kettle 2
+	ar_kettle_Miostar_MHK0111_a1
+	ar_kettle_Miostar_MHK0111_a2
+Model lampCFL 2
+	ar_lampCFL_Ikea_ES7G0607_a1
+	ar_lampCFL_Ikea_ES7G0607_a2
+Model lampInc 2
+	ar_lampInc_Duralamp_M1308_a1
+	ar_lampInc_Duralamp_M1308_a2
+Model Laptop 2
+	ar_laptop_Acer_TravelMate6593_a1
+	ar_laptop_Acer_TravelMate6593_a2
+Model Microwave 2
+	ar_microwave_Siemens_a1
+	ar_microwave_Siemens_a2
+Model Mobile phone (via charger) 2
+	dz_mobile_SonyEricsson_W890i_a1
+	dz_mobile_SonyEricsson_W890i_a2
+Model Monitor 2
+	ar_monitor_Dell_P2211HT_a1
+	ar_monitor_Dell_P2211HT_a2
+Model Printer 2
+	ar_printer_HP_LaserJet-1320n_a1
+	ar_printer_HP_LaserJet-1320n_a2
+Model Shaver 2
+	ar_shaver_Braun_5510_a1
+	ar_shaver_Braun_5510_a2
