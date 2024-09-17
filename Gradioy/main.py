@@ -30,13 +30,15 @@ def predict(*inputs):
 demo = gr.Interface(
     fn=predict,
     inputs=[
-        gr.Slider(minimum=0, maximum=100, step=1, value=50, label="Voltage"),
-        gr.Slider(minimum=0, maximum=100, step=1, value=50, label="Current"),
-        gr.Slider(minimum=0, maximum=100, step=1, value=50, label="Active Power"),
-        gr.Slider(minimum=0, maximum=100, step=1, value=50, label="Reactive Power"),
-        gr.Slider(minimum=0, maximum=100, step=1, value=50, label="Apparent Power"),
+        gr.Slider(minimum=0, maximum=3000, step=50, value=1550, label="Real Power (W)"),
+        gr.Slider(minimum=0, maximum=500, step=10, value=250, label="Reactive Power (var)"),
+        gr.Slider(minimum=0, maximum=100, step=0.1, value=7.75, label="RMS Current (A)"),
+        gr.Slider(minimum=0, maximum=100, step=10, value=50, label="Frequency (Hz)"),
+        gr.Slider(minimum=0, maximum=300, step=10, value=220, label="RMS Voltage (V)"),
+        gr.Slider(minimum=-100, maximum=100, step=5, value=0, label="Phase Angle (φ)"),
     ],
-    outputs=[gr.Plot(), gr.Image(type="filepath")]
+    outputs=[gr.Plot(), gr.Image(type="filepath")],
+    theme=gr.themes.Monochrome()
 )
 
-demo.launch()
+demo.launch(share=True)
