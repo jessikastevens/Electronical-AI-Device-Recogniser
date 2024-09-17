@@ -1,0 +1,46 @@
+Protocol 2 ; version 1 ; Test ; Fold 10
+Model TV (LCD / LED) 2
+	ar_Tv_SonyBravia_KDL-40W5500_a1
+	ar_Tv_SonyBravia_KDL-40W5500_a2
+Model Coffee machine 2
+	cg_coffeeMachine_Koenig_CapriAutomatic_a1
+	cg_coffeeMachine_Koenig_CapriAutomatic_a2
+Model Computer station (with monitor) 2
+	ar_computer-monitor_as3-PhilipsBrillance220B_a1
+	ar_computer-monitor_as3-PhilipsBrillance220B_a2
+Model Fan 2
+	ar_fan_CsFerrari_Oasi40_a1
+	ar_fan_CsFerrari_Oasi40_a2
+Model Fridge / Freezer 2
+	ar_fridge_Ariston_Hotpoint_a1
+	ar_fridge_Ariston_Hotpoint_a2
+Model Hi-Fi system (with CD player) 2
+	ar_hifi_Panasonic_RX-DT37_a1
+	ar_hifi_Panasonic_RX-DT37_a2
+Model Kettle 2
+	ar_kettle_Tefal_Dampierre_a1
+	ar_kettle_Tefal_Dampierre_a2
+Model lampCFL 2
+	ar_lampCFL_Electronic_2817_a1
+	ar_lampCFL_Electronic_2817_a2
+Model lampInc 2
+	ar_lampInc_Duralamp_A5102_a1
+	ar_lampInc_Duralamp_A5102_a2
+Model Laptop 2
+	ar_laptop_Lenovo_W500_a1
+	ar_laptop_Lenovo_W500_a2
+Model Microwave 2
+	ar_microwave_Miostar2_a1
+	ar_microwave_Miostar2_a2
+Model Mobile phone (via charger) 2
+	jh_mobile_HTC_HD7_a1
+	jh_mobile_HTC_HD7_a2
+Model Monitor 2
+	ar_monitor_Philips_Brillance220B2_a1
+	ar_monitor_Philips_Brillance220B2_a2
+Model Printer 2
+	ar_printer_HP_Deskjet3520_a1
+	ar_printer_HP_Deskjet3520_a2
+Model Shaver 2
+	ar_shaver_Philips_HO8200_a1
+	ar_shaver_Philips_HO8200_a2
