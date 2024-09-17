@@ -19,7 +19,13 @@ def predict(*inputs):
     plt.xticks(rotation=45, ha='right')
     plt.tight_layout()
 
-    return fig
+
+    largest_item = max(appliance_counts, key=appliance_counts.get)
+    print(largest_item)    
+
+    largest_item_image = r"Gradioy/pictures/" + largest_item + ".jpg"
+
+    return fig , largest_item_image
 
 demo = gr.Interface(
     fn=predict,
@@ -30,7 +36,7 @@ demo = gr.Interface(
         gr.Slider(minimum=0, maximum=100, step=1, value=50, label="Reactive Power"),
         gr.Slider(minimum=0, maximum=100, step=1, value=50, label="Apparent Power"),
     ],
-    outputs=gr.Plot()
+    outputs=[gr.Plot(), gr.Image(type="filepath")]
 )
 
 demo.launch()
