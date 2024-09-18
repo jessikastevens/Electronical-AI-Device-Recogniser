@@ -48,9 +48,11 @@ demo = gr.Interface(
     ],
     outputs=[gr.Text(label="Identified Appliance"), gr.Image(type="filepath", label="Appliance Image")],
     theme=gr.themes.Monochrome(),
-    examples=[
-        [ 800, 400, 6.5, 50, 230, 0],  # Example tosta
-    ]
+    examples = [
+    [ 800, 400, 6.5, 50, 230, 0],  # Example tosta
+    [1350, 650, 8.0, 50, 230, 20]   # Average dishwasher
+]
 )
 
 demo.launch(share=True)
+
