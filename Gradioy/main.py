@@ -2,6 +2,8 @@ import gradio as gr
 import random
 import matplotlib.pyplot as plt
 
+
+
 def predict(*inputs):
     kitchen_appliances = ["Refrigerator", "Oven", "Microwave", "Dishwasher", "Toaster", "Blender", "Coffee Maker", "Electric Kettle", "Food Processor", "Slow Cooker"]
     
