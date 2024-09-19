@@ -2,7 +2,6 @@ from flask import Flask, jsonify, request
 import time
 import json
 import random
-import matplotlib.pyplot as plt
 
 
 app = Flask(__name__)
