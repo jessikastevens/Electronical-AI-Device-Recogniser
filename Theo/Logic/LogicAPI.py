@@ -12,7 +12,10 @@ def api():
 @app.route('/AI', methods=['GET', 'POST'])
 def api():
     print('StartAI')
-    if request == ['POST']
+    if request == ['POST']:
+        print('Post')
+
+        
 
     
 
