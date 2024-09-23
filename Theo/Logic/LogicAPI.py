@@ -3,51 +3,56 @@ import json
 import pandas as pd 
 import os
 import requests
+import datetime
 
 app = Flask(__name__)
 
-@app.route('/AI', methods=['GET'])
+@app.route('/AI', methods=['POST'])
 def ai_route():
-    if request.method == 'GET':
-        print('StartAI')
-        data = request.get_json()
-        
-        real_power = data.get('Real Power')
-        reactive_power = data.get('Reactive Power')
-        rms_current = data.get('RMS Current')
-        frequency = data.get('Frequency')
-        rms_voltage = data.get('RMS Voltage')
-        phase_angle = data.get('Phase Angle')
-        
-        ordered_array = [frequency, phase_angle, real_power, reactive_power, rms_current, rms_voltage]
-        
-        # Convert list to JSON
-        data_json = json.dumps(ordered_array)
+    print('StartAI')
+    data = request.get_json()
+    
+    real_power = data.get('Real Power')
+    reactive_power = data.get('Reactive Power')
+    rms_current = data.get('RMS Current')
+    frequency = data.get('Frequency')
+    rms_voltage = data.get('RMS Voltage')
+    phase_angle = data.get('Phase Angle')
+    date = data.get('Date')
+    time = data.get('time')
 
-        # # Send GET request
-        # url = os.environ.get('AI_API_URL')
-        # response = requests.get(url, json=data_json)
+    # Combine date and time
+    combined_datetime = datetime.datetime.strptime(f"{date} {time}", '%Y-%m-%d %H:%M:%S')
 
-        # Return to front end
-        return data_json
+    # Convert combined datetime to string in the desired format
+    combined_datetime_str = combined_datetime.strftime('%Y-%m-%d %H:%M:%S')
 
-@app.route('/CSV', methods=['GET', 'POST'])
+    ordered_array = [frequency, phase_angle, real_power, reactive_power, rms_current, rms_voltage]
+
+    # Create a dictionary with the desired format
+    data_dict = {
+        "features": ordered_array,
+        "time": combined_datetime_str
+    }
+
+    # Send POST request
+    url = os.environ.get('AI_API_URL', 'http://localhost:6000')
+    response = requests.post(url, json=data_dict)
+
+    return jsonify(response.json())
+
+@app.route('/CSV', methods=['POST'])
 def csv_route():
     print('StartCSV')
-    if request.method == 'POST':
-        print('Post')
+    data = request.get_json()
+
+    appliance_type = data.get('Appliance')
+    date_1 = data.get('Begin Date')
+    date_2 = data.get('Ending Date')
     
-        data = request.get_json()
+    # TODO: Implement CSV processing logic here
     
-        appliance_type = data.get('Appliance')
-        date_1 = data.get('Begin Date')
-        date_2 = data.get('Ending Date')
-        
-        # Process the data here
-        
-        return jsonify({"message": "Data received successfully"})
-    
-    return jsonify({"error": "Method not allowed"}), 405
+    return jsonify({"message": "CSV processing completed", "appliance": appliance_type, "start": date_1, "end": date_2})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5000)
