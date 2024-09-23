@@ -51,6 +51,8 @@ def csv_route():
     date_2 = data.get('Ending Date')
     
     # TODO: Implement CSV processing logic here
+    #   look to your left to see the graph scetch you did to help you rember
+    #   bessicaly yeha just return the date range of the specifc item and all the values form the csv one then format that one here then send it off pretty ggez
     
     return jsonify({"message": "CSV processing completed", "appliance": appliance_type, "start": date_1, "end": date_2})
 
