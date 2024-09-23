@@ -6,9 +6,9 @@ import pandas as pd
 
 app = Flask(__name__)
 
-# Load the model and scaler when the app starts
-model = load_model('your_model.h5')  # Replace with your actual model path
-scaler = joblib.load('scaler.pkl')   # Replace with your actual scaler path
+
+model = load_model('khanya/saved models/appliance_recogniser1.keras')  
+scaler = joblib.load('scaler.pkl')   
 
 @app.route('/', methods=['POST'])
 def api():
