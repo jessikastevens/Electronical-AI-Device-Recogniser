@@ -9,7 +9,7 @@ import os
 load_dotenv()
 
 # Dropdown options for the first interface
-options_1 = ['Fridges & Freezers', 'TVs', 'Hi-Fi systems (with CD players)', 'Laptops', 'Computer stations', 
+options_1 = ['Fridges & Freezers', 'TVs', 'Hi-Fi systems (with CD players)', 'Laptops', 'Computer stations','Incandescent lamps' , 
              'Compact fluorescent lamps', 'Microwaves', 'Coffee machines', 'Mobile phones', 'Printers']
 
 # Function to filter options for dropdown interface
@@ -35,13 +35,13 @@ def handle_combined_input(option_1, start_datetime, end_datetime):
         "End_time": end_datetime,
     })
  
- 
+    print(payload)
     response = requests.request("POST", url, data=payload)
 
     return response
 
 
-def predict():
+def predict(real_power_slider, reactive_power_slider, rms_current_slider, frequency_slider, rms_voltage_slider, phase_angle_slider, mode_dropdown, single_datetime):
     print('')
 
 
