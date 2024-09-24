@@ -28,23 +28,29 @@ def handle_date_range(start_datetime, end_datetime):
 # Combine Dropdown and Date inputs in a single function
 def handle_combined_input(option_1, start_datetime, end_datetime):
     print('Predict')
-    url = os.environ.get('Logic_API_URL')
- 
-    #Comvert to proper dates and time ( - Theo )
-    start_datetime = datetime.datetime.fromtimestamp(start_datetime).strftime('%Y-%m-%d %H:%M:%S')
-    end_datetime = datetime.datetime.fromtimestamp(end_datetime).strftime('%Y-%m-%d %H:%M:%S')
+    url = os.environ.get('Logic_API_URL_CSV')
 
+    
 
-    payload = json.dumps({
+    payload = {
         "Appliance": option_1,
         "start": start_datetime,
         "end": end_datetime,
-    })
- 
-    print(payload)
-    response = requests.request("POST", url, data=payload)
+    }
+
+    print("API URL:", url)
+    print("Payload:", json.dumps(payload, indent=4))
+
+    headers = {
+        "Content-Type": "application/json",
+    }
+    response = requests.post(url, json=payload, headers=headers)
+
+    print('Response Status Code:', response.status_code)
+    print('Response Text:', response.text)  # Log full response for debugging
 
     return response
+
 
 
 def predict(real_power_slider, reactive_power_slider, rms_current_slider, frequency_slider, rms_voltage_slider, phase_angle_slider, mode_dropdown, single_datetime):
