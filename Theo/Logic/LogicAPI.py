@@ -4,6 +4,23 @@ import requests
 from flask import Flask, jsonify, request
 from datetime import datetime
 
+appliance_names = {
+    'Fridges_and_freezers': 'Fridges & Freezers',
+    'Televisions_(LCD_or_LED)': 'TVs',
+    'Hi-Fi_systems_(with_CD_players)': 'Hi-Fi systems (with CD players)',
+    'Laptops_(via_chargers)': 'Laptops',
+    'Computers_stations_(with_monitors)': 'Computer stations',
+    'Lamps_(compact_fluorescent)': 'Compact fluorescent lamps',
+    'Microwave_ovens': 'Microwaves',
+    'Coffee_machines': 'Coffee machines',
+    'Mobile_phones_(via_chargers)': 'Mobile phones',
+    'Printers': 'Printers',
+    'Fans': 'Fans',
+    'Kettles': 'Kettles',
+    'Lamps_(incandescent)': 'Incandescent lamps',
+    'Monitors': 'TVs',
+    'Shavers_(via_chargers)': 'Shavers'
+}
 
 appliance_tags = {
     1: 'Coffee Machine',
@@ -99,12 +116,16 @@ def csv_route():
     print('StartCSV')
     data = request.get_json()
 
-    # Send POST request to CSV API
+    # Transform the dat
+    transformed_data = {
+        "appliance_type": appliance_names.get(data['Appliance'], data['Appliance']),
+        "start": datetime.utcfromtimestamp(data['Start_time']).strftime("%Y-%m-%d %H:%M:%S"),
+        "end": datetime.utcfromtimestamp(data['End_time']).strftime("%Y-%m-%d %H:%M:%S")
+    }
+
     url = os.getenv('CSV_API_URL')
+    response = requests.post(url, json=transformed_data)
 
-    response = requests.post(url, json=data)
-
-    return jsonify(response.json())
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
