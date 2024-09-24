@@ -1,56 +1,49 @@
-import random
-from flask import Flask, jsonify, request
 import numpy as np
+from flask import Flask, jsonify, request
 from tensorflow.keras.models import load_model
 
 app = Flask(__name__)
+
+# Load the model once when the API starts to avoid reloading it on every request
+model = load_model(r'C:\Users\honey\Documents\placment work\Electronical-AI-Device-Recogniser\khanya\AIAPI\appliance_recogniser#2.keras')
 
 @app.route('/', methods=['POST'])
 def api():
     data = request.get_json()
 
     '''
-        This is the json format the data will be inputed as
-
-                {
-            "Real Power": 100,
-            "Reactive Power": 50,
-            "RMS Current": 10,
-            "Frequency": 60,
-            "RMS Voltage": 220,
-            "Phase Angle": 30,
-            "Date": "2022-01-01",
-            "time": "12:00:00"
-                }       
+    Expected JSON format:
+    {
+        "Real Power": 100,
+        "Reactive Power": 50,
+        "RMS Current": 10,
+        "Frequency": 60,
+        "RMS Voltage": 220,
+        "Phase Angle": 30,
+        "Date": "2022-01-01",
+        "time": "12:00:00"
+    }
     '''
-    # Load your pre-trained model (this is just an example, adjust according to your model and framework)
-    model = load_model(r'khanya/data managment/saved models/appliance_recogniser#2.keras')
-
-    # Extract the relevant fields from the input data and convert them into a list
+    # Extract the relevant fields from the input data
     input_list = [
-        data["Real Power"],
-        data["Reactive Power"],
-        data["RMS Current"],
-        data["Frequency"],
-        data["RMS Voltage"],
-        data["Phase Angle"]
+        data.get("Real Power", 0),
+        data.get("Reactive Power", 0),
+        data.get("RMS Current", 0),
+        data.get("Frequency", 0),
+        data.get("RMS Voltage", 0),
+        data.get("Phase Angle", 0)
     ]
 
-    # Convert the list to a numpy array and reshape if necessary
+    # Convert the list to a numpy array and reshape to the correct format for the model
     input_data = np.array(input_list).reshape((1, -1))
 
-    # Make a prediction using the model
+    # Make a prediction using the loaded model
     raw_prediction = model.predict(input_data)[0]
 
-    # Get the index of the highest value of raw_prediction
+    # Get the index of the highest value from the raw prediction
     predicted_class = int(np.argmax(raw_prediction))
 
-    # Generate random raw prediction (10 items with positive probabilities that sum up to 1)
-    raw_prediction = np.random.dirichlet(np.ones(15))
-
-    # The index of the highest value of raw_prediction
-    predicted_class = int(np.argmax(raw_prediction))
-    
+    # Return the predicted class and the raw prediction probabilities
     return jsonify({
         "predicted_class": predicted_class,
         "raw_prediction": raw_prediction.tolist()  # Convert numpy array to list
