@@ -9,9 +9,23 @@ app = Flask(__name__)
 def api():
     data = request.get_json()
 
+    '''
+        This is the json format the data will be inputed as
+
+                {
+            "Real Power": 100,
+            "Reactive Power": 50,
+            "RMS Current": 10,
+            "Frequency": 60,
+            "RMS Voltage": 220,
+            "Phase Angle": 30,
+            "Date": "2022-01-01",
+            "time": "12:00:00"
+                }       
+    '''
     # Load your pre-trained model (this is just an example, adjust according to your model and framework)
 
-    model = load_model('path_to_your_model.h5')
+    model = load_model('khanya/data managment/saved models/appliance_recogniser1.keras')
 
     # Preprocess the input data as required by your model
     input_data = np.array(data['input'])  # Assuming the input data is in the 'input' field of the JSON
