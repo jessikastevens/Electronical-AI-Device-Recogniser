@@ -59,7 +59,7 @@ def handle_combined_input(option_1, start_datetime, end_datetime):
 
 
 def predict(real_power_slider, reactive_power_slider, rms_current_slider, frequency_slider, rms_voltage_slider, 
-            phase_angle_slider, mode_dropdown, single_datetime):
+            phase_angle_slider,  single_datetime):
     print('')
     url = os.environ.get('Logic_API_URL_AI')
 
@@ -70,7 +70,7 @@ def predict(real_power_slider, reactive_power_slider, rms_current_slider, freque
         "Frequency": frequency_slider,
         "RMS voltage": rms_voltage_slider,
         "Phase angle": phase_angle_slider,
-        "Date": mode_dropdown,
+        "Date": 'poo',
         "Time": single_datetime,
     }
     print("API URL:", url)
@@ -121,7 +121,6 @@ with gr.Blocks() as prediction_tab:
             frequency_slider = gr.Slider(minimum=0, maximum=100, step=10, value=50, label="Frequency (Hz)")
             rms_voltage_slider = gr.Slider(minimum=0, maximum=300, step=10, value=220, label="RMS Voltage (V)")
             phase_angle_slider = gr.Slider(minimum=-100, maximum=100, step=5, value=0, label="Phase Angle (φ)")
-            mode_dropdown = gr.Dropdown(choices=['Random', 'WeightedPrediction'], label='Mode', info='Pick Mode')
 
             # Single DateTime Picker on Prediction Tab
             single_datetime = gr.DateTime(label="Select a Date and Time")
