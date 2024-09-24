@@ -5,7 +5,7 @@ from tensorflow.keras.models import load_model
 app = Flask(__name__)
 
 # Load the model once when the API starts to avoid reloading it on every request
-model = load_model('khanya/data managment/saved models/appliance_recogniser#2.keras')
+model = load_model(r'C:\Users\honey\Documents\placment work\Electronical-AI-Device-Recogniser\khanya\AIAPI\appliance_recogniser#2.keras')
 
 @app.route('/', methods=['POST'])
 def api():
@@ -26,12 +26,12 @@ def api():
     '''
     # Extract the relevant fields from the input data
     input_list = [
-        data["Real Power"],
-        data["Reactive Power"],
-        data["RMS Current"],
-        data["Frequency"],
-        data["RMS Voltage"],
-        data["Phase Angle"]
+        data.get("Real Power", 0),
+        data.get("Reactive Power", 0),
+        data.get("RMS Current", 0),
+        data.get("Frequency", 0),
+        data.get("RMS Voltage", 0),
+        data.get("Phase Angle", 0)
     ]
 
     # Convert the list to a numpy array and reshape to the correct format for the model
