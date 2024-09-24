@@ -24,7 +24,7 @@ def api():
                 }       
     '''
     # Load your pre-trained model (this is just an example, adjust according to your model and framework)
-    model = load_model('khanya/data managment/saved models/appliance_recogniser#2.keras')
+    model = load_model(r'khanya/data managment/saved models/appliance_recogniser#2.keras')
 
     # Extract the relevant fields from the input data and convert them into a list
     input_list = [
