@@ -11,7 +11,7 @@ values_to_delete = df1['originalIndex'].tolist()
 df2 = df2.drop(values_to_delete)  # Drop rows by index in df2
 
 # Save the updated df2 back to a CSV file
-df2.to_csv('acs-f2-dataset.csv', index=False)
+df2.to_csv(r'khanya\data managment\acs-f2-dataset.csv', index=False)
 if len(df2) < len(pd.read_csv(r'khanya\data managment\acs-f2-dataset.csv')):
     print("success")
 else:
