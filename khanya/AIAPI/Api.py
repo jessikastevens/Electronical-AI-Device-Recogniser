@@ -24,12 +24,20 @@ def api():
                 }       
     '''
     # Load your pre-trained model (this is just an example, adjust according to your model and framework)
+    model = load_model('khanya/data managment/saved models/appliance_recogniser#2.keras')
 
-    model = load_model('khanya/data managment/saved models/appliance_recogniser1.keras')
+    # Extract the relevant fields from the input data and convert them into a list
+    input_list = [
+        data["Real Power"],
+        data["Reactive Power"],
+        data["RMS Current"],
+        data["Frequency"],
+        data["RMS Voltage"],
+        data["Phase Angle"]
+    ]
 
-    # Preprocess the input data as required by your model
-    input_data = np.array(data['input'])  # Assuming the input data is in the 'input' field of the JSON
-    input_data = input_data.reshape((1, -1))  # Reshape if necessary
+    # Convert the list to a numpy array and reshape if necessary
+    input_data = np.array(input_list).reshape((1, -1))
 
     # Make a prediction using the model
     raw_prediction = model.predict(input_data)[0]
@@ -40,8 +48,7 @@ def api():
     # Generate random raw prediction (10 items with positive probabilities that sum up to 1)
     raw_prediction = np.random.dirichlet(np.ones(15))
 
-
-    #the index of the hightst value of raw_prediction
+    # The index of the highest value of raw_prediction
     predicted_class = int(np.argmax(raw_prediction))
     
     return jsonify({
