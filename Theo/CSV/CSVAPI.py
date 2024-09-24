@@ -1,34 +1,41 @@
 from flask import Flask, jsonify, request
 import pandas as pd
-from datetime import datetime
+import os
 
 app = Flask(__name__)
 
-@app.route('/', methods=['POST'])
-def api():
-    data = pd.read_csv('Theo/CSV/acs-f2-dataset 1.csv')
+DATA_FILE = 'Theo/CSV/acs-f2-dataset 1.csv'
+data = None
+
+def load_data():
+    global data
+    data = pd.read_csv(DATA_FILE)
     data['time'] = pd.to_datetime(data['time'])
 
+@app.before_first_request
+def initialize():
+    load_data()
+
+@app.route('/', methods=['POST'])
+def api():
     request_data = request.get_json()
 
-    equipment = request_data.get('Appliance')
-    start_date = pd.to_datetime(request_data.get('start'))
-    end_date = pd.to_datetime(request_data.get('end'))
+    equipment = request_data['Appliance']
+    start_date = pd.to_datetime(request_data['start'])
+    end_date = pd.to_datetime(request_data['end'])
 
     filtered_data = data[(data['time'] >= start_date) & 
                          (data['time'] <= end_date) & 
                          (data['equipment'] == equipment)]
     
     columns = list(filtered_data.columns)
-    filtered_data = filtered_data[columns]
-
+    
     response = {
         "columns": columns,
-        "data": filtered_data.values.tolist() 
+        "data": filtered_data.values.tolist()
     }
 
     return jsonify(response)
 
-
 if __name__ == '__main__':
-    app.run(debug=True,port=7000)
+    app.run(debug=True, port=7000)
