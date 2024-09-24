@@ -5,7 +5,8 @@ import requests
 import json
 from dotenv import load_dotenv
 import os
-import datetime
+from datetime import datetime
+
 
 load_dotenv()
 
@@ -26,16 +27,20 @@ def handle_date_range(start_datetime, end_datetime):
     return f"Selected Date Range: {start_datetime} to {end_datetime}"
 
 # Combine Dropdown and Date inputs in a single function
+
+
 def handle_combined_input(option_1, start_datetime, end_datetime):
     print('Predict')
     url = os.environ.get('Logic_API_URL_CSV')
 
-    
+    # Convert the timestamp format
+    start_datetime_str = datetime.fromtimestamp(start_datetime).strftime("%Y-%m-%d %H:%M:%S")
+    end_datetime_str = datetime.fromtimestamp(end_datetime).strftime("%Y-%m-%d %H:%M:%S")
 
     payload = {
         "Appliance": option_1,
-        "start": start_datetime,
-        "end": end_datetime,
+        "start": start_datetime_str,
+        "end": end_datetime_str,
     }
 
     print("API URL:", url)
