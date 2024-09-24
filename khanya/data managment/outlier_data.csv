@@ -1,4 +1,4 @@
-freq,phAngle,power,reacPower,rmsCur,rmsVolt,time,equipment
+freq,phAngle,power,reacPower,rmsCur,rmsVolt,time,equipment,originalIndex
 50.0,0,71.294,-1.353,0.307,232.993,2013-12-17 17:50:40,Coffee_machines,203
 50.0,357,39.758,-2.081,0.171,232.916,2013-12-17 17:52:00,Coffee_machines,211
 50.0,0,235.844,-2.497,1.012,233.658,2013-12-17 17:53:50,Coffee_machines,222
