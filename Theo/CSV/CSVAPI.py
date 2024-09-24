@@ -9,15 +9,17 @@ data = None
 
 def load_data():
     global data
-    data = pd.read_csv(DATA_FILE)
-    data['time'] = pd.to_datetime(data['time'])
-
-@app.before_first_request
-def initialize():
-    load_data()
+    if data is None:
+        data = pd.read_csv(DATA_FILE)
+        data['time'] = pd.to_datetime(data['time'])
 
 @app.route('/', methods=['POST'])
 def api():
+    print('api start')
+    
+    # Ensure data is loaded
+    load_data()
+    
     request_data = request.get_json()
 
     equipment = request_data['Appliance']
@@ -34,7 +36,7 @@ def api():
         "columns": columns,
         "data": filtered_data.values.tolist()
     }
-
+    print(response)
     return jsonify(response)
 
 if __name__ == '__main__':
