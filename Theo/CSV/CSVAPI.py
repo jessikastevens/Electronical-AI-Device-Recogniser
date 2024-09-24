@@ -12,8 +12,8 @@ def api():
     request_data = request.get_json()
 
     equipment = request_data.get('Appliance')
-    start_date = pd.to_datetime(request_data.get('Start_time'))
-    end_date = pd.to_datetime(request_data.get('End_time'))
+    start_date = pd.to_datetime(request_data.get('start'))
+    end_date = pd.to_datetime(request_data.get('end'))
 
     filtered_data = data[(data['time'] >= start_date) & 
                          (data['time'] <= end_date) & 
