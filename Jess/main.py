@@ -58,8 +58,33 @@ def handle_combined_input(option_1, start_datetime, end_datetime):
 
 
 
-def predict(real_power_slider, reactive_power_slider, rms_current_slider, frequency_slider, rms_voltage_slider, phase_angle_slider, mode_dropdown, single_datetime):
+def predict(real_power_slider, reactive_power_slider, rms_current_slider, frequency_slider, rms_voltage_slider, 
+            phase_angle_slider, mode_dropdown, single_datetime):
     print('')
+    url = os.environ.get('Logic_API_URL_AI')
+
+    payload = {
+        "Real power": real_power_slider,
+        "Reactive power": reactive_power_slider,
+        "RMS current": rms_current_slider,
+        "Frequency": frequency_slider,
+        "RMS voltage": rms_voltage_slider,
+        "Phase angle": phase_angle_slider,
+        "Date": mode_dropdown,
+        "Time": single_datetime,
+    }
+    print("API URL:", url)
+    print("Payload:", json.dumps(payload, indent=4))
+
+    headers = {
+        "Content-Type": "application/json",
+    }
+    response = requests.post(url, json=payload, headers=headers)
+
+    print('Response Status Code:', response.status_code)
+    print('Response Text:', response.text)  # Log full response for debugging
+
+    return response
 
 
 
