@@ -11,6 +11,7 @@ def find_outliers_IQR(df):
     outliers = df[((numeric_df < (Q1 - 1.5 * IQR)) | (numeric_df > (Q3 + 1.5 * IQR))).any(axis=1)]
     return outliers
 
+
 # Initialize the row counter
 start_row = 0
 chunk_size = 100
@@ -42,13 +43,13 @@ while True:
     
     # Update the row counter
     start_row += chunk_size
-    # Clear the outlier file if it exists
-    outlier_file_path = 'khanya\outlier_data.csv'
-    if os.path.exists(outlier_file_path):
-        os.remove(outlier_file_path)
+    
+
+
     
     # Add a column to note the original row numbers of the outliers
     outliers['original_row'] = outliers.index + start_row
     
     # Append the outliers to the outlier_data.csv file
+    outliers.columns = ['freq', 'phAngle', 'power', 'reacPower', 'rmsCur', 'rmsVolt', 'time', 'equipment', 'original_row']
     outliers.to_csv('khanya\outlier_data.csv', mode='a', header=not os.path.exists('khanya\outlier_data.csv'), index=False)
