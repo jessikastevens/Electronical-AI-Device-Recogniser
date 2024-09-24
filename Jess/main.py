@@ -3,6 +3,10 @@ import random
 import matplotlib.pyplot as plt
 import requests
 import json
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # Dropdown options for the first interface
 options_1 = ['Fridges & Freezers', 'TVs', 'Hi-Fi systems (with CD players)', 'Laptops', 'Computer stations', 
@@ -22,59 +26,25 @@ def handle_date_range(start_datetime, end_datetime):
 
 # Combine Dropdown and Date inputs in a single function
 def handle_combined_input(option_1, start_datetime, end_datetime):
-    dropdown_msg = f"You selected '{option_1}' in the dropdown."
-    range_msg = f"Selected Date Range: {start_datetime} to {end_datetime}"
-    return f"{dropdown_msg}\n{range_msg}"
-
-# Function to plot the bar graph
-def plot(x, y):
-    fig = plt.figure(figsize=(10, 6))
-    ax = fig.add_subplot(111)
-    ax.bar(x, y)
-    ax.set_xlabel("Appliance")
-    ax.set_ylabel("Chance (%)")
-    ax.set_title("Kitchen Appliance Identification")
-    plt.xticks(rotation=45, ha='right')
-    plt.tight_layout()
-    
-    return fig
-
-# Function to predict appliance using external API and plot data
-def predict(real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle, Mode, single_datetime):
-    url = "http://127.0.0.1:5000/api"  # Make sure your API is running here!
-
+    print('Predict')
+    url = os.environ.get('Logic_API_URL')
+ 
     payload = json.dumps({
-        "Real Power": real_power,
-        "Reactive Power": reactive_power,
-        "RMS Current": rms_current,
-        "Frequency": frequency,
-        "RMS Voltage": rms_voltage,
-        "Phase Angle": phase_angle,
-        "mode": Mode,
-        "datetime": single_datetime
+        "Appliance": option_1,
+        "Start_time": start_datetime,
+        "End_time": end_datetime,
     })
+ 
+ 
+    response = requests.request("POST", url, data=payload)
 
-    headers = {
-        'Content-Type': 'application/json'
-    }
+    return response
 
-    try:
-        response = requests.post(url, headers=headers, data=payload)
-        response.raise_for_status()
-        response_dict = response.json()
 
-        largest_item_image = response_dict['image_path']
-        x = response_dict['xvalue']
-        y = response_dict['yvalue']
-        appliance = response_dict['appliance']
+def predict():
+    print('')
 
-        fig = plot(x, y)
 
-        return fig, largest_item_image, appliance
-
-    except requests.exceptions.RequestException as e:
-        print(f"Error occurred: {e}")
-        return None, None, "Error: Could not fetch appliance data"
 
 # Tab 1: Dropdown and Date Range Inputs
 with gr.Blocks() as input_tab:
