@@ -9,7 +9,7 @@ import os
 load_dotenv()
 
 # Dropdown options for the first interface
-options_1 = ['Fridges & Freezers', 'TVs', 'Hi-Fi systems (with CD players)', 'Laptops', 'Computer stations', 
+options_1 = ['Fridges & Freezers', 'TVs', 'Hi-Fi systems (with CD players)', 'Laptops', 'Computer stations','Incandescent lamps' , 
              'Compact fluorescent lamps', 'Microwaves', 'Coffee machines', 'Mobile phones', 'Printers']
 
 # Function to filter options for dropdown interface
