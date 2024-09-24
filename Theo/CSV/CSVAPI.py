@@ -11,15 +11,15 @@ def api():
 
     request_data = request.get_json()
 
-    equipment = request_data.get('appliance_type')
-    start_date = pd.to_datetime(request_data.get('start'))
-    end_date = pd.to_datetime(request_data.get('end'))
+    equipment = request_data.get('Appliance')
+    start_date = pd.to_datetime(request_data.get('Start_time'))
+    end_date = pd.to_datetime(request_data.get('End_time'))
 
     filtered_data = data[(data['time'] >= start_date) & 
                          (data['time'] <= end_date) & 
                          (data['equipment'] == equipment)]
     
-    columns = ['time', 'rmsVolt', 'rmsCur', 'power', 'reacPower']
+    columns = list(filtered_data.columns)
     filtered_data = filtered_data[columns]
 
     response = {

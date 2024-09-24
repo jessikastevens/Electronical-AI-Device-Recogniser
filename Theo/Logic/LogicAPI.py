@@ -4,6 +4,25 @@ import requests
 from flask import Flask, jsonify, request
 from datetime import datetime
 
+
+appliance_tags = {
+    1: 'Coffee Machine',
+    2: 'Computer Station',
+    3: 'Fan',
+    4: 'Fridge / Freezer',
+    5: 'Hi-Fi System',
+    6: 'Kettle',
+    7: 'CFL Lamp',
+    8: 'Incandescent Lamp',
+    9: 'Laptop Charger',
+    10: 'Microwave',
+    11: 'Phone Charger',
+    12: 'Monitor',
+    13: 'Printer',
+    14: 'Shaver Charger',
+    15: 'LCD/LED TV'
+}
+
 # Load .env variables
 load_dotenv()
 
@@ -35,13 +54,45 @@ def ai_route():
     }
 
     # Send POST request to AI API
-    url = os.getenv('AI_API_URL')  # Use os.getenv to get environment variable
-    if not url:
-        return jsonify({"error": "AI_API_URL not set"}), 500
+    url = os.getenv('AI_API_URL')
 
     response = requests.post(url, json=data_dict)
+    
+    response = response.json()
 
-    return jsonify(response.json())
+    predicted_class = response['predicted_class']
+
+    raw_prediction = response['raw_prediction']
+    formatted_prediction = {}
+
+    for i in range(len(raw_prediction)):
+        appliance_name = appliance_tags[i + 1]
+        probability = round(raw_prediction[i], 2)  # Round to 2 decimal places
+        formatted_prediction[appliance_name] = probability
+
+    predicted_appliance = appliance_tags[predicted_class + 1]
+
+    return jsonify({
+        "predicted_appliance": predicted_appliance,
+        "raw_predictions": formatted_prediction
+    })
+
+    formatted_prediction = {}
+
+    for i in range(len(raw_prediction)):
+
+        appliance_name = appliance_tags[i + 1]
+        probability = raw_prediction[i]
+        formatted_prediction[appliance_name] = probability
+
+
+    predicted_appliance = appliance_tags[predicted_class + 1]
+
+    return jsonify({
+        "predicted_appliance": predicted_appliance,
+        "raw_predictions": formatted_prediction
+    })
+
 
 @app.route('/Lcsv', methods=['POST'])
 def csv_route():
@@ -50,8 +101,6 @@ def csv_route():
 
     # Send POST request to CSV API
     url = os.getenv('CSV_API_URL')
-    if not url:
-        return jsonify({"error": "CSV_API_URL not set"}), 500
 
     response = requests.post(url, json=data)
 
