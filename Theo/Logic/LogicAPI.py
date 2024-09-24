@@ -88,6 +88,7 @@ def ai_route():
 
 @app.route('/csv', methods=['POST'])
 def csv_route():
+    print('CSV START')
     data = request.get_json()
 
     payload = {
@@ -95,9 +96,10 @@ def csv_route():
         "start": data['start'],
         "end": data['end']
     }
-
+    print(payload)
     response = requests.post(os.getenv('CSV_API_URL'), json=payload)
+    print(f'Send {response}')
     return response.json()
 
 if __name__ == '__main__':
-    app.run(debugg=True , port=5000)
+    app.run(debug=True , port=5000)
