@@ -59,10 +59,20 @@ def handle_combined_input(option_1, start_datetime, end_datetime):
 
 
 def predict(real_power_slider, reactive_power_slider, rms_current_slider, frequency_slider, rms_voltage_slider, 
-            phase_angle_slider,  single_datetime):
+            phase_angle_slider, single_datetime):
     print('')
     url = os.environ.get('Logic_API_URL_AI')
 
+    # Parse the single_datetime into a Date (YYYY-MM-DD) and Time (HH:MM:SS)
+    try:
+        dt_object = datetime.strptime(single_datetime, '%Y-%m-%d %H:%M:%S')
+        date_str = dt_object.strftime('%Y-%m-%d')
+        time_str = dt_object.strftime('%H:%M:%S')
+    except ValueError as e:
+        print(f"Error parsing datetime: {e}")
+        return None
+
+    # Create the payload with separated Date and Time
     payload = {
         "Real power": real_power_slider,
         "Reactive power": reactive_power_slider,
@@ -70,8 +80,8 @@ def predict(real_power_slider, reactive_power_slider, rms_current_slider, freque
         "Frequency": frequency_slider,
         "RMS voltage": rms_voltage_slider,
         "Phase angle": phase_angle_slider,
-        "Date": 'poo',
-        "Time": single_datetime,
+        "Date": date_str,
+        "Time": time_str,
     }
     print("API URL:", url)
     print("Payload:", json.dumps(payload, indent=4))
@@ -85,7 +95,6 @@ def predict(real_power_slider, reactive_power_slider, rms_current_slider, freque
     print('Response Text:', response.text)  # Log full response for debugging
 
     return response
-
 
 
 # Tab 1: Dropdown and Date Range Inputs
