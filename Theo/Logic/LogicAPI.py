@@ -1,13 +1,15 @@
-from flask import Flask, jsonify, request
-import json
-import pandas as pd 
+from dotenv import load_dotenv
 import os
 import requests
-import datetime
+from flask import Flask, jsonify, request
+from datetime import datetime
+
+# Load .env variables
+load_dotenv()
 
 app = Flask(__name__)
 
-@app.route('/AI', methods=['POST'])
+@app.route('/Lai', methods=['POST'])
 def ai_route():
     print('StartAI')
     data = request.get_json()
@@ -22,39 +24,38 @@ def ai_route():
     time = data.get('time')
 
     # Combine date and time
-    combined_datetime = datetime.datetime.strptime(f"{date} {time}", '%Y-%m-%d %H:%M:%S')
-
-    # Convert combined datetime to string in the desired format
+    combined_datetime = datetime.strptime(f"{date} {time}", '%Y-%m-%d %H:%M:%S')
     combined_datetime_str = combined_datetime.strftime('%Y-%m-%d %H:%M:%S')
 
     ordered_array = [frequency, phase_angle, real_power, reactive_power, rms_current, rms_voltage]
 
-    # Create a dictionary with the desired format
     data_dict = {
         "features": ordered_array,
         "time": combined_datetime_str
     }
 
-    # Send POST request
-    url = os.environ.get('AI_API_URL', 'http://localhost:6000')
+    # Send POST request to AI API
+    url = os.getenv('AI_API_URL')  # Use os.getenv to get environment variable
+    if not url:
+        return jsonify({"error": "AI_API_URL not set"}), 500
+
     response = requests.post(url, json=data_dict)
 
     return jsonify(response.json())
 
-@app.route('/CSV', methods=['POST'])
+@app.route('/Lcsv', methods=['POST'])
 def csv_route():
     print('StartCSV')
     data = request.get_json()
 
-    appliance_type = data.get('Appliance')
-    date_1 = data.get('Begin Date')
-    date_2 = data.get('Ending Date')
-    
-    # TODO: Implement CSV processing logic here
-    #   look to your left to see the graph scetch you did to help you rember
-    #   bessicaly yeha just return the date range of the specifc item and all the values form the csv one then format that one here then send it off pretty ggez
-    
-    return jsonify({"message": "CSV processing completed", "appliance": appliance_type, "start": date_1, "end": date_2})
+    # Send POST request to CSV API
+    url = os.getenv('CSV_API_URL')
+    if not url:
+        return jsonify({"error": "CSV_API_URL not set"}), 500
+
+    response = requests.post(url, json=data)
+
+    return jsonify(response.json())
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
