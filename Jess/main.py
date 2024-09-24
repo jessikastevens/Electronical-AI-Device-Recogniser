@@ -5,6 +5,7 @@ import requests
 import json
 from dotenv import load_dotenv
 import os
+import datetime
 
 load_dotenv()
 
@@ -29,10 +30,15 @@ def handle_combined_input(option_1, start_datetime, end_datetime):
     print('Predict')
     url = os.environ.get('Logic_API_URL')
  
+    #Comvert to proper dates and time ( - Theo )
+    start_datetime = datetime.datetime.fromtimestamp(start_datetime).strftime('%Y-%m-%d %H:%M:%S')
+    end_datetime = datetime.datetime.fromtimestamp(end_datetime).strftime('%Y-%m-%d %H:%M:%S')
+
+
     payload = json.dumps({
         "Appliance": option_1,
-        "Start_time": start_datetime,
-        "End_time": end_datetime,
+        "start": start_datetime,
+        "end": end_datetime,
     })
  
     print(payload)
