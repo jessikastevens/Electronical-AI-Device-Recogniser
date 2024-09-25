@@ -74,7 +74,7 @@ def predict(real_power_slider, reactive_power_slider, rms_current_slider, freque
 MAX_GRAPHS = 4
 
 # In your Blocks definition:
-with gr.Blocks() as demo:
+with gr.Blocks(theme="monochrome") as demo: 
     with gr.Tab("Veiw Data"):
         with gr.Row():
             with gr.Column():
