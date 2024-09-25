@@ -5,7 +5,7 @@ from tensorflow.keras.models import load_model
 app = Flask(__name__)
 
 # Load the model once when the API starts to avoid reloading it on every request
-model = load_model(r'khanya\AIAPI\appliance_recogniser#3.keras')
+model = load_model(r'C:\Users\honey\Documents\placment work\Electronical-AI-Device-Recogniser\khanya\AIAPI\appliance_recogniser#2.keras')
 
 @app.route('/', methods=['POST'])
 def api():

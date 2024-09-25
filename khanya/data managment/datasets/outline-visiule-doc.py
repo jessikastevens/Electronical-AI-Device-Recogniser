@@ -15,7 +15,7 @@ def find_outliers_IQR(df):
 # Initialize the row counter
 start_row = 0
 chunk_size = 100
-file_path = r'khanya\acs-f2-dataset 1.csv'
+file_path = r'c:/Users/honey/Documents/placment work/Electronical-AI-Device-Recogniser/khanya/data managment/acs-f2-dataset.csv'
 
 if not os.path.exists(file_path):
     raise FileNotFoundError(f"The file {file_path} does not exist.")
