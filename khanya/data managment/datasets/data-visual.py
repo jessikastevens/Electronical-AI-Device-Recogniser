@@ -8,7 +8,7 @@ df = pd.read_csv(r'c:/Users/honey/Documents/placment work/Electronical-AI-Device
 # Plot Current against Time
 plt.figure(figsize=(10, 6))
 plt.scatter(df.iloc[:, 4], df.iloc[:, 5], color='orange',edgecolors='black', linewidth=0.5)
-plt.title('Current vs Time')
+plt.title('volt vs Time')
 plt.xlabel('Time')
 plt.ylabel('Current')
 plt.grid(True)
