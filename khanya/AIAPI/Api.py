@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 # Load the model once when the API starts to avoid reloading it on every request
 model = load_model(r'khanya\AIAPI\appliance_recogniser#3.keras')
-
+model.summary()  
 @app.route('/', methods=['POST'])
 def api():
     data = request.get_json()
