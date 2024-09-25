@@ -75,7 +75,7 @@ MAX_GRAPHS = 4
 
 # In your Blocks definition:
 with gr.Blocks() as demo:
-    with gr.Tab("Dropdown & Date Range"):
+    with gr.Tab("Veiw Data"):
         with gr.Row():
             with gr.Column():
                 num_graphs = gr.Dropdown(choices=options_3, label="Select Number of Graphs", value=1)
@@ -109,7 +109,7 @@ with gr.Blocks() as demo:
         )
 
 
-    with gr.Tab("AI Device Prediction & Date Selection"):
+    with gr.Tab("Device Prediction"):
         with gr.Row():
             with gr.Column():
                 real_power_slider = gr.Slider(minimum=0, maximum=4000, step=50, value=1550, label="Real Power (W)")
