@@ -14,9 +14,24 @@ load_dotenv()
 options_1 = ['Fridges & Freezers', 'TVs', 'Hi-Fi systems (with CD players)', 'Laptops', 'Computer stations','Incandescent lamps' , 
              'Compact fluorescent lamps', 'Microwaves', 'Coffee machines', 'Mobile phones', 'Printers']
 
+options_2 = ['Line graph', 'Bar graph', 'Pie chart', 'Scatter graph', 'Violin graph']
+
+options_3 = [i for i in range (1,101)]
+
+def generate_appliance_dropdowns(num_graphs):
+    # Generate dropdown elements based on the number selected
+    dropdowns = [gr.Dropdown(choices=options_1, label=f"Select Appliance {i+1}") for i in range(num_graphs)]
+    return dropdowns
+
 # Function to filter options for dropdown interface
 def filter_options(option_1):
     return f"You selected '{option_1}' in the dropdown."
+
+def filter_options2(option_2):
+    return f"You selected '{option_2}' in the dropdown."
+
+def filter_options3(option_3):
+    return f"You selected '{option_3}' in the dropdown"
 
 # Handling single datetime input
 def handle_single_datetime(datetime_value):
@@ -29,7 +44,7 @@ def handle_date_range(start_datetime, end_datetime):
 # Combine Dropdown and Date inputs in a single function
 
 
-def handle_combined_input(option_1, start_datetime, end_datetime):
+def handle_combined_input(option_1, start_datetime, end_datetime, dropdown2, dropdown3):
     print('Predict')
     url = os.environ.get('Logic_API_URL_CSV')
 
@@ -96,17 +111,26 @@ def predict(real_power_slider, reactive_power_slider, rms_current_slider, freque
 
     return response
 
+def update_appliance_dropdowns(num_graphs):
+    # Return a list of updated appliance dropdown components
+    return generate_appliance_dropdowns(num_graphs)
 
 # Tab 1: Dropdown and Date Range Inputs
 with gr.Blocks() as input_tab:
     with gr.Row():
         with gr.Column():
             # Dropdown for appliance selection
-            dropdown = gr.Dropdown(choices=options_1, label="Appliance Type")
+            dropdown = gr.Dropdown(choices=options_1, label="Select Appliance Type")
 
             # Date Range Picker
             start_datetime = gr.DateTime(label="Start Date and Time")
             end_datetime = gr.DateTime(label="End Date and Time")
+
+            dropdown2 = gr.Dropdown(choices=options_2, label = "Select Graph Type")
+
+            dropdown3 = gr.Dropdown(choices=options_3, label = "Select Number of Graphs")
+
+            appliance_dropdown_container = gr.Column()
 
             # Button to submit selections
             submit_button = gr.Button("Submit")
@@ -114,9 +138,11 @@ with gr.Blocks() as input_tab:
         # Output Textbox to display results
         result_output = gr.Textbox(label="Output")
 
+    dropdown3.change(fn=update_appliance_dropdowns, inputs=dropdown3, outputs=appliance_dropdown_container)
+
     # Bind the function to the submit button
     submit_button.click(fn=handle_combined_input, 
-                        inputs=[dropdown, start_datetime, end_datetime],
+                        inputs=[dropdown, start_datetime, end_datetime, dropdown2, dropdown3],
                         outputs=result_output)
 
 # Tab 2: Prediction Interface with DateTime Input
