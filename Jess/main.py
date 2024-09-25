@@ -72,23 +72,19 @@ def predict(real_power_slider, reactive_power_slider, rms_current_slider, freque
     return response.text
 
 MAX_GRAPHS = 4
-
-# Set default start and end dates using the specified dates
-default_start_datetime = datetime(2001, 1, 1, 1, 5, 19)  # Earliest date
-default_end_datetime = datetime(2014, 2, 13, 12, 48, 20)  # Oldest date
+default_start_datetime = "2001-01-01 01:05:19"  # Earliest date
+default_end_datetime = "2014-02-13 12:48:20"  # Oldest date
 
 # In your Blocks definition:
-with gr.Blocks(theme="monochrome") as demo:  # This applies the theme to everything
-    with gr.Tab("Dropdown & Date Range"):
+with gr.Blocks(theme="monochrome") as demo: 
+    with gr.Tab("Veiw Data"):
         with gr.Row():
             with gr.Column():
-                num_graphs = gr.Dropdown(choices=options_3, label="Select Number of Graphs", value=default_num_graphs)
-                appliance_dropdowns = [gr.Dropdown(choices=options_1, label=f"Select Appliance {i+1}", 
-                                                    value=default_appliances if i == 0 else None, 
-                                                    visible=i==0) for i in range(MAX_GRAPHS)]
+                num_graphs = gr.Dropdown(choices=options_3, label="Select Number of Graphs", value=1)
+                appliance_dropdowns = [gr.Dropdown(choices=options_1, label=f"Select Appliance {i+1}", visible=i==0) for i in range(MAX_GRAPHS)]
                 start_datetime = gr.DateTime(label="Start Date and Time", value=default_start_datetime)
                 end_datetime = gr.DateTime(label="End Date and Time", value=default_end_datetime)
-                graph_type = gr.Dropdown(choices=options_2, label="Select Graph Type", value=default_graph_type)
+                graph_type = gr.Dropdown(choices=options_2, label="Select Graph Type")
                 submit_button = gr.Button("Submit")
 
         result_output = gr.Textbox(label="Output")
