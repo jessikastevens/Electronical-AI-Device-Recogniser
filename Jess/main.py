@@ -135,7 +135,7 @@ with gr.Blocks() as prediction_tab:
     # Bind the predict function to the predict button
     predict_button.click(fn=predict, 
                          inputs=[real_power_slider, reactive_power_slider, rms_current_slider, frequency_slider, 
-                                 rms_voltage_slider, phase_angle_slider, mode_dropdown, single_datetime],
+                                 rms_voltage_slider, phase_angle_slider, single_datetime],
                          outputs=[prediction_plot, prediction_image, prediction_text])
 
 # Combine into a Tabbed Interface
