@@ -47,11 +47,15 @@ def api():
 
     result = {}
     for appliance in appliances:
-        # Use 'equipment' column instead of 'appliance'
         appliance_data = df_filtered[df_filtered['equipment'] == appliance]
         result[appliance] = {
             'timestamp': appliance_data['time'].tolist(),
-            'power': appliance_data['power'].tolist()
+            'power': appliance_data['power'].tolist(),
+            'freq': appliance_data['freq'].tolist(),
+            'phAngle': appliance_data['phAngle'].tolist(),
+            'reacPower': appliance_data['reacPower'].tolist(),
+            'rmsCur': appliance_data['rmsCur'].tolist(),
+            'rmsVolt': appliance_data['rmsVolt'].tolist(),
         }
 
     response = {
