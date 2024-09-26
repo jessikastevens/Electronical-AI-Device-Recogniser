@@ -1,36 +1,51 @@
-import matplotlib.pyplot as plt
 import json
+import numpy as np
+import matplotlib.pyplot as plt
 
-# Load the JSON data
-with open(r'Testing\Gradioy\response.json', 'r') as file:
-    data = json.load(file)
+# Load JSON data (replace with actual file loading logic)
+file_path = r'Testing\Gradioy\response.json'
+with open(file_path, 'r') as file:
+    data = json.load(file)['data']
 
-# Get the number of appliances
-appliances = list(data['data'].keys())
-num_appliances = len(appliances)
+def get_average_per_day(values, points_per_day=24):
+    """
+    Get average daily values for a list of values.
+    We assume each day has `points_per_day` data points.
+    """
+    averages = []
+    for i in range(0, len(values), points_per_day):
+        day_values = values[i:i + points_per_day]
+        avg = np.mean(day_values)
+        averages.append(avg)
+    return averages
 
-# Define the parameters to plot
-parameters = ['freq', 'phAngle', 'power', 'reacPower', 'rmsCur', 'rmsVolt']
-param_names = ['Frequency', 'Phase Angle', 'Power', 'Reactive Power', 'RMS Current', 'RMS Voltage']
-units = ['Hz', 'degrees', 'W', 'VAR', 'A', 'V']
+def plot_data_per_device(data):
+    # Measurement types to be plotted
+    measurement_types = ['freq', 'phAngle', 'power', 'reacPower', 'rmsCur', 'rmsVolt']
+    devices = list(data.keys())  # Get device names
+    
+    # Create subplots
+    fig, axs = plt.subplots(len(devices), len(measurement_types), figsize=(25, 4 * len(devices)))
+    
+    # Loop through devices and measurements
+    for device_index, device in enumerate(devices):
+        for measure_index, measure in enumerate(measurement_types):
+            if measure in data[device]:
+                # Calculate average per day for this measurement
+                avg_data = get_average_per_day(data[device][measure])
+                
+                # Plot data
+                axs[device_index, measure_index].plot(avg_data)
+                axs[device_index, measure_index].set_title(f'{device} - {measure}')
+                axs[device_index, measure_index].set_xlabel('Time (hours)')
+                axs[device_index, measure_index].set_ylabel(measure.capitalize())
+                axs[device_index, measure_index].grid(True)
+            else:
+                # If the device doesn't have this measurement, leave the plot blank
+                axs[device_index, measure_index].axis('off')
 
-# Create a figure with subplots for each appliance and parameter
-fig, axs = plt.subplots(num_appliances, len(parameters), figsize=(20, 5*num_appliances))
-fig.suptitle('Electrical Parameters for Various Appliances', fontsize=16)
+    plt.tight_layout()
+    plt.show()
 
-# Plot data for each appliance and parameter
-for i, appliance in enumerate(appliances):
-    for j, (param, name, unit) in enumerate(zip(parameters, param_names, units)):
-        ax = axs[i, j] if num_appliances > 1 else axs[j]
-        values = data['data'][appliance][param]
-        time = range(len(values))
-        
-        ax.bar(time, values)  # Change plot type to bar plot
-        ax.set_title(f'{appliance}: {name}')
-        ax.set_xlabel('Time')
-        ax.set_ylabel(f'{name} ({unit})')
-        ax.grid(True)
-
-# Adjust layout and display the plot
-plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-plt.show()
+# Call the plotting function
+plot_data_per_device(data)
