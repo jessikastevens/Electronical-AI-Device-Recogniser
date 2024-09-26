@@ -1,26 +1,69 @@
-
-#Gradio
 import gradio as gr
-import random
 import matplotlib.pyplot as plt
 import requests
 import json
 from dotenv import load_dotenv
 import os
 from datetime import datetime
+import numpy as np
 
 load_dotenv()
 
-
-options_1 = ['Fridges & Freezers', 'TVs', 'Hi-Fi systems (with CD players)', 'Laptops', 'Computer stations', 'Incandescent lamps',
+# Constants
+OPTIONS_1 = ['Fridges & Freezers', 'TVs', 'Hi-Fi systems (with CD players)', 'Laptops', 'Computer stations', 'Incandescent lamps',
              'Compact fluorescent lamps', 'Microwaves', 'Coffee machines', 'Mobile phones', 'Printers']
+OPTIONS_2 = ['Line graph', 'Bar graph', 'Pie chart', 'Scatter graph', 'Violin graph']
+OPTIONS_3 = [i for i in range(1, 11)]
+MAX_GRAPHS = 10
+DEFAULT_START_DATETIME = "2001-01-01 01:05:19"
+DEFAULT_END_DATETIME = "2014-02-13 12:48:20"
 
-options_2 = ['Line graph', 'Bar graph', 'Pie chart', 'Scatter graph', 'Violin graph']
+def get_average_per_hour(values, timestamps):
+    """Get average hourly values for a list of values."""
+    # Convert timestamps to datetime objects
+    timestamps = [datetime.strptime(ts, "%a, %d %b %Y %H:%M:%S %Z") for ts in timestamps]
+    
+    # Initialize a list to store the sum of the values for each hour and a count of the number of values
+    hourly_sums = [0] * 24
+    hourly_counts = [0] * 24
+    
+    # Iterate over the values and their corresponding timestamps
+    for value, timestamp in zip(values, timestamps):
+        # Add the value to the sum for the corresponding hour and increment the count
+        hour = timestamp.hour
+        hourly_sums[hour] += value
+        hourly_counts[hour] += 1
+    
+    # Calculate the average value for each hour
+    hourly_avgs = [total / count if count > 0 else 0 for total, count in zip(hourly_sums, hourly_counts)]
+    
+    return hourly_avgs
+def plot_data_per_device(data):
+    """Generate a matplotlib figure with plots for each device and measurement."""
+    measurement_types = ['freq', 'phAngle', 'power', 'reacPower', 'rmsCur', 'rmsVolt']
+    devices = list(data.keys())
+    
+    fig, axs = plt.subplots(len(devices), len(measurement_types), figsize=(25, 4 * len(devices)))
+    axs = axs.reshape(len(devices), -1) if len(devices) > 1 else axs.reshape(1, -1)
+    
+    for device_index, device in enumerate(devices):
+        for measure_index, measure in enumerate(measurement_types):
+            if measure in data[device]:
+                avg_data = get_average_per_hour(data[device][measure], data[device]['timestamp'])
+                
+                axs[device_index, measure_index].plot(avg_data)
+                axs[device_index, measure_index].set_title(f'{device} - {measure}')
+                axs[device_index, measure_index].set_xlabel('Hour of the Day')
+                axs[device_index, measure_index].set_ylabel(measure.capitalize())
+                axs[device_index, measure_index].grid(True)
+            else:
+                axs[device_index, measure_index].axis('off')
 
-options_3 = [i for i in range(1, 5)]  
-
+    plt.tight_layout()
+    return fig
 
 def handle_combined_input(appliances, start_datetime, end_datetime, graph_type, num_graphs):
+    """Handle the combined input for graphing functionality."""
     url = os.environ.get('Logic_API_URL_CSV')
 
     start_datetime_str = datetime.fromtimestamp(start_datetime).strftime("%Y-%m-%d %H:%M:%S")
@@ -34,68 +77,74 @@ def handle_combined_input(appliances, start_datetime, end_datetime, graph_type, 
         "num_graphs": num_graphs
     }
 
-    print("API URL:", url)
-    print("Payload:", json.dumps(payload, indent=4))
+    # print("API URL:", url)
+    # print("Payload:", json.dumps(payload, indent=4))
 
-    headers = {
-        "Content-Type": "application/json",
-    }
+    headers = {"Content-Type": "application/json"}
     response = requests.post(url, json=payload, headers=headers)
 
-    print('Response Status Code:', response.status_code)
-    print('Response Text:', response.text)
+    # print('Response Status Code:', response.status_code)
+    # print('Response Text:', response.text)
 
-    #plot
+    if response.status_code == 200:
+        try:
+            data = response.json()['data']
+            fig = plot_data_per_device(data)
+            return fig
+        except json.JSONDecodeError:
+            return "Error: Invalid JSON response from the server."
+        except KeyError:
+            return "Error: Unexpected data format in the response."
+    else:
+        return f"Error: API request failed with status code {response.status_code}"
 
-    return response.text
-
-
-def predict(real_power_slider, reactive_power_slider, rms_current_slider, frequency_slider, rms_voltage_slider, 
-            phase_angle_slider, single_datetime):
+def predict(real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle, single_datetime):
+    """Handle the prediction functionality."""
     url = os.environ.get('Logic_API_URL_AI')
 
-    dt_object = datetime.fromtimestamp(float(single_datetime))
+    dt_object = datetime.fromtimestamp(single_datetime)
     date_str = dt_object.strftime('%Y-%m-%d')
     time_str = dt_object.strftime('%H:%M:%S')
 
     payload = {
-        "Real Power": real_power_slider,
-        "Reactive Power": reactive_power_slider,
-        "RMS Current": rms_current_slider,
-        "Frequency": frequency_slider,
-        "RMS Voltage": rms_voltage_slider,
-        "Phase Angle": phase_angle_slider,
+        "Real Power": real_power,
+        "Reactive Power": reactive_power,
+        "RMS Current": rms_current,
+        "Frequency": frequency,
+        "RMS Voltage": rms_voltage,
+        "Phase Angle": phase_angle,
         "Date": date_str,
         "time": time_str,
     }
 
-    headers = {
-        "Content-Type": "application/json",
-    }
+    headers = {"Content-Type": "application/json"}
     response = requests.post(url, json=payload, headers=headers)
 
     return response.text
 
-MAX_GRAPHS = 4
-default_start_datetime = "2001-01-01 01:05:19"  # Earliest date
-default_end_datetime = "2014-02-13 12:48:20"  # Oldest date
+def update_dropdown_visibility(num):
+    """Update the visibility of appliance dropdowns based on the number of graphs selected."""
+    return [gr.update(visible=i < num) for i in range(MAX_GRAPHS)]
 
-# In your Blocks definition:
+def gather_inputs(num, *args):
+    """Gather inputs from the UI and call the handle_combined_input function."""
+    appliances = [arg for arg in args[:num] if arg] 
+    start_dt, end_dt, graph_type = args[-3:]
+    return handle_combined_input(appliances, start_dt, end_dt, graph_type, num)
+
+# Gradio interface
 with gr.Blocks(theme="monochrome") as demo: 
-    with gr.Tab("Veiw Data"):
+    with gr.Tab("View Data"):
         with gr.Row():
             with gr.Column():
-                num_graphs = gr.Dropdown(choices=options_3, label="Select Number of Graphs", value=1)
-                appliance_dropdowns = [gr.Dropdown(choices=options_1, label=f"Select Appliance {i+1}", visible=i==0) for i in range(MAX_GRAPHS)]
-                start_datetime = gr.DateTime(label="Start Date and Time", value=default_start_datetime)
-                end_datetime = gr.DateTime(label="End Date and Time", value=default_end_datetime)
-                graph_type = gr.Dropdown(choices=options_2, label="Select Graph Type")
+                num_graphs = gr.Dropdown(choices=OPTIONS_3, label="Select Number of Graphs", value=1)
+                appliance_dropdowns = [gr.Dropdown(choices=OPTIONS_1, label=f"Select Appliance {i+1}", visible=i==0) for i in range(MAX_GRAPHS)]
+                start_datetime = gr.DateTime(label="Start Date and Time", value=DEFAULT_START_DATETIME)
+                end_datetime = gr.DateTime(label="End Date and Time", value=DEFAULT_END_DATETIME)
+                graph_type = gr.Dropdown(choices=OPTIONS_2, label="Select Graph Type")
                 submit_button = gr.Button("Submit")
 
-        result_output = gr.Textbox(label="Output")
-
-        def update_dropdown_visibility(num):
-            return [gr.update(visible=i < num) for i in range(MAX_GRAPHS)]
+        result_output = gr.Plot(label="Graph Output")
 
         num_graphs.change(
             fn=update_dropdown_visibility,
@@ -103,18 +152,11 @@ with gr.Blocks(theme="monochrome") as demo:
             outputs=appliance_dropdowns
         )
 
-        def gather_inputs(num, *args):
-            appliances = [arg for arg in args[:num] if arg] 
-            start_dt, end_dt, graph_type = args[-3:]
-            return handle_combined_input(appliances, start_dt, end_dt, graph_type, num)
-
-
         submit_button.click(
             fn=gather_inputs,
             inputs=[num_graphs] + appliance_dropdowns + [start_datetime, end_datetime, graph_type],
             outputs=[result_output]
         )
-
 
     with gr.Tab("Device Prediction"):
         with gr.Row():
@@ -137,4 +179,5 @@ with gr.Blocks(theme="monochrome") as demo:
             outputs=[predict_output]
         )
 
-demo.launch(share=True)
+if __name__ == "__main__":
+    demo.launch(share=True)
