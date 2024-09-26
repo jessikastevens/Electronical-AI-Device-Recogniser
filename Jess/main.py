@@ -1,3 +1,5 @@
+
+#Gradio
 import gradio as gr
 import random
 import matplotlib.pyplot as plt
@@ -43,7 +45,10 @@ def handle_combined_input(appliances, start_datetime, end_datetime, graph_type, 
     print('Response Status Code:', response.status_code)
     print('Response Text:', response.text)
 
+    #plot
+
     return response.text
+
 
 def predict(real_power_slider, reactive_power_slider, rms_current_slider, frequency_slider, rms_voltage_slider, 
             phase_angle_slider, single_datetime):
@@ -98,11 +103,11 @@ with gr.Blocks(theme="monochrome") as demo:
             outputs=appliance_dropdowns
         )
 
-        # Update your gather_inputs function to handle the new structure
         def gather_inputs(num, *args):
-            appliances = args[:num]
+            appliances = [arg for arg in args[:num] if arg] 
             start_dt, end_dt, graph_type = args[-3:]
             return handle_combined_input(appliances, start_dt, end_dt, graph_type, num)
+
 
         submit_button.click(
             fn=gather_inputs,

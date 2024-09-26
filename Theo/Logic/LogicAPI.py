@@ -1,3 +1,4 @@
+#Logic API
 from dotenv import load_dotenv
 import os
 import requests
@@ -92,9 +93,11 @@ def csv_route():
     data = request.get_json()
 
     payload = {
-        "Appliance": APPLIANCE_TERMS[data['Appliance']],
+        "Appliances": [APPLIANCE_TERMS[appliance] for appliance in data['Appliances']],
         "start": data['start'],
-        "end": data['end']
+        "end": data['end'],
+        "graph_type": data['graph_type'],
+        "num_graphs": data['num_graphs']
     }
     print(payload)
     response = requests.post(os.getenv('CSV_API_URL'), json=payload)
@@ -102,4 +105,4 @@ def csv_route():
     return response.json()
 
 if __name__ == '__main__':
-    app.run(debug=True , port=5000)
+    app.run(debug=True, port=5000)
