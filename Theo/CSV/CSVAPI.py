@@ -1,42 +1,69 @@
-from flask import Flask, jsonify, request
+from flask import Flask, request, jsonify
 import pandas as pd
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 
-DATA_FILE = 'Theo/CSV/acs-f2-dataset 1.csv'
-data = None
-
-def load_data():
-    global data
-    if data is None:
-        data = pd.read_csv(DATA_FILE)
-        data['time'] = pd.to_datetime(data['time'])
-
 @app.route('/', methods=['POST'])
 def api():
-    print('api start')
-    
-    # Ensure data is loaded
-    load_data()
-    
     request_data = request.get_json()
 
-    equipment = request_data['Appliance']
-    start_date = pd.to_datetime(request_data['start'])
-    end_date = pd.to_datetime(request_data['end'])
+    appliances = request_data.get('Appliances')
+    if not appliances:
+        return jsonify({"error": "'Appliances' key is missing"}), 400
 
-    filtered_data = data[(data['time'] >= start_date) & 
-                         (data['time'] <= end_date) & 
-                         (data['equipment'] == equipment)]
-    
-    columns = list(filtered_data.columns)
-    
+    start_time = request_data.get('start')
+    if not start_time:
+        return jsonify({"error": "'start' key is missing"}), 400
+
+    end_time = request_data.get('end')
+    if not end_time:
+        return jsonify({"error": "'end' key is missing"}), 400
+
+    graph_type = request_data.get('graph_type')
+    if not graph_type:
+        return jsonify({"error": "'graph_type' key is missing"}), 400
+
+    num_graphs = request_data.get('num_graphs')
+    if not num_graphs:
+        return jsonify({"error": "'num_graphs' key is missing"}), 400
+
+    csv_file_path = os.getenv('CSV_FILE_PATH')
+
+    if not csv_file_path or not os.path.isfile(csv_file_path):
+        return jsonify({"error": "Invalid or missing CSV file path"}), 500
+
+    df = pd.read_csv(csv_file_path)
+
+    # Convert the 'time' column to datetime
+    df['time'] = pd.to_datetime(df['time'])
+
+    # Filter the dataframe based on the time range
+    mask = (df['time'] >= start_time) & (df['time'] <= end_time)
+    df_filtered = df.loc[mask]
+
+    result = {}
+    for appliance in appliances:
+        appliance_data = df_filtered[df_filtered['equipment'] == appliance]
+        result[appliance] = {
+            'timestamp': appliance_data['time'].tolist(),
+            'power': appliance_data['power'].tolist(),
+            'freq': appliance_data['freq'].tolist(),
+            'phAngle': appliance_data['phAngle'].tolist(),
+            'reacPower': appliance_data['reacPower'].tolist(),
+            'rmsCur': appliance_data['rmsCur'].tolist(),
+            'rmsVolt': appliance_data['rmsVolt'].tolist(),
+        }
+
     response = {
-        "columns": columns,
-        "data": filtered_data.values.tolist()
+        'data': result,
+        'graph_type': graph_type,
+        'num_graphs': num_graphs
     }
-    print(response)
+
     return jsonify(response)
 
 if __name__ == '__main__':
