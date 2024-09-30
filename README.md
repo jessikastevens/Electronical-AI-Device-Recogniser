@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/8265b98d-0701-4731-a261-f9244fa83458)---
+---
 
 # Electronical AI Device Recogniser
 
@@ -14,6 +14,7 @@ This project uses machine learning to identify electronic devices based on user 
 - [Jessika Stevens](https://github.com/jessikastevens)
 - [Theo Knights](https://github.com/23knightst813)
 - [Khanya Malgas-Mcfadden](https://github.com/khanya-mcfadden)
+    (30/09/2024)
   ![image](https://github.com/user-attachments/assets/10254338-82b7-4d00-b2e8-091fda2e37a9)
 
 
