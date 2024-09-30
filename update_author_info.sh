@@ -1,12 +1,12 @@
 git filter-branch --env-filter '
-OLD_NAME="23kngightst813"
-CORRECT_NAME="23knightst813"
-if [ "$GIT_COMMITTER_NAME" = "$OLD_NAME" ]
+if [ "$GIT_AUTHOR_NAME" = "23kngightst813" ];
 then
-    export GIT_COMMITTER_NAME="$CORRECT_NAME"
+    GIT_AUTHOR_NAME="23knightst813";
+    GIT_AUTHOR_EMAIL="23knightst813@collyers.ac.uk";
 fi
-if [ "$GIT_AUTHOR_NAME" = "$OLD_NAME" ]
+if [ "$GIT_COMMITTER_NAME" = "23kngightst813" ];
 then
-    export GIT_AUTHOR_NAME="$CORRECT_NAME"
+    GIT_COMMITTER_NAME="23knightst813";
+    GIT_COMMITTER_EMAIL="23knightst813@collyers.ac.uk";
 fi
 ' --tag-name-filter cat -- --branches --tags
