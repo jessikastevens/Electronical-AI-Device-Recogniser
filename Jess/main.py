@@ -17,27 +17,25 @@ DEFAULT_START_DATETIME = "2001-01-01 01:05:19"
 DEFAULT_END_DATETIME = "2014-02-13 12:48:20"
 
 def get_average_per_hour(values, timestamps):
-    # Initialize lists to hold sums and counts for each hour
+    """Get average hourly values for a list of values."""
+    # Convert timestamps to datetime objects
+    timestamps = [datetime.strptime(ts, "%a, %d %b %Y %H:%M:%S %Z") for ts in timestamps]
+    
+    # Initialize a list to store the sum of the values for each hour and a count of the number of values
     hourly_sums = [0] * 24
     hourly_counts = [0] * 24
-
-    for i in range(len(values)):
-        timestamp = datetime.strptime(timestamps[i], "%a, %d %b %Y %H:%M:%S %Z")
-        
+    
+    # Iterate over the values and their corresponding timestamps
+    for value, timestamp in zip(values, timestamps):
+        # Add the value to the sum for the corresponding hour and increment the count
         hour = timestamp.hour
         
         hourly_sums[hour] += values[i]
         
         hourly_counts[hour] += 1
-
-    hourly_avgs = [0] * 24
-
-    # Calculate the average for each hour
-    for i in range(24):
-        if hourly_counts[i] > 0:
-            hourly_avgs[i] = hourly_sums[i] / hourly_counts[i]
-
-    return hourly_avgs
+    
+    # Calculate the average value for each hour
+    hourly_avgs = [total / count if count > 0 else 0 for total, count in zip(hourly_sums, hourly_counts)]
     
     return hourly_avgs
 def plot_data_per_device(data, plot_type):
@@ -113,6 +111,38 @@ def handle_combined_input(appliances, start_datetime, end_datetime, graph_type, 
     else:
         return f"Error: API request failed with status code {response.status_code}"
 
+def plot_prediction_data(real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle):
+    # Define the labels for each feature
+    labels = ['Real Power (W)', 'Reactive Power (var)', 'RMS Current (A)', 'Frequency (Hz)', 'RMS Voltage (V)', 'Phase Angle (φ)']
+    values = [real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle]
+    
+    # Create a bar graph
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    ax.bar(labels, values, color=['blue', 'orange', 'green', 'red', 'purple', 'brown'])
+    
+    # Set titles and labels
+    ax.set_title('Device Parameters Bar Graph')
+    ax.set_ylabel('Values')
+    
+    # Rotate labels for better readability
+    plt.xticks(rotation=45, ha='right')
+
+    # Adjust layout to avoid label cutoff
+    plt.tight_layout()
+    
+    return fig
+
+# Updated prediction function to return both prediction and graph
+def predict_with_graph(real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle, single_datetime):
+    # Get the prediction
+    prediction = predict(real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle, single_datetime)
+    
+    # Generate the bar graph
+    fig = plot_prediction_data(real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle)
+    
+    return prediction, fig
+
 def predict(real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle, single_datetime):
     url = os.environ.get('Logic_API_URL_AI')
 
@@ -183,12 +213,14 @@ with gr.Blocks(theme="monochrome") as demo:
                 predict_button = gr.Button("Predict")
 
         predict_output = gr.Textbox(label="Prediction Output")
+        graph_output = gr.Plot(label="Graph Output")
 
+        # Modify the click event to return both the prediction text and bar graph
         predict_button.click(
-            fn=predict,
+            fn=predict_with_graph,
             inputs=[real_power_slider, reactive_power_slider, rms_current_slider, frequency_slider,
                     rms_voltage_slider, phase_angle_slider, single_datetime],
-            outputs=[predict_output]
+            outputs=[predict_output, graph_output]
         )
 
 if __name__ == "__main__":
