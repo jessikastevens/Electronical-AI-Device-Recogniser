@@ -9,9 +9,7 @@ import numpy as np
 
 load_dotenv()
 
-# Constants
-OPTIONS_1 = ['Fridges & Freezers', 'TVs', 'Hi-Fi systems (with CD players)', 'Laptops', 'Computer stations', 'Incandescent lamps',
-             'Compact fluorescent lamps', 'Microwaves', 'Coffee machines', 'Mobile phones', 'Printers']
+OPTIONS_1 = ['Fridges & Freezers', 'TVs', 'Hi-Fi systems (with CD players)', 'Laptops', 'Computer stations', 'Incandescent lamps',             'Compact fluorescent lamps', 'Microwaves', 'Coffee machines', 'Mobile phones', 'Printers']
 OPTIONS_2 = ['Line graph', 'Bar graph', 'Pie chart', 'Scatter graph', 'Violin graph']
 OPTIONS_3 = [i for i in range(1, 11)]
 MAX_GRAPHS = 10
@@ -19,39 +17,56 @@ DEFAULT_START_DATETIME = "2001-01-01 01:05:19"
 DEFAULT_END_DATETIME = "2014-02-13 12:48:20"
 
 def get_average_per_hour(values, timestamps):
-    """Get average hourly values for a list of values."""
-    # Convert timestamps to datetime objects
-    timestamps = [datetime.strptime(ts, "%a, %d %b %Y %H:%M:%S %Z") for ts in timestamps]
-    
-    # Initialize a list to store the sum of the values for each hour and a count of the number of values
+    # Initialize lists to hold sums and counts for each hour
     hourly_sums = [0] * 24
     hourly_counts = [0] * 24
-    
-    # Iterate over the values and their corresponding timestamps
-    for value, timestamp in zip(values, timestamps):
-        # Add the value to the sum for the corresponding hour and increment the count
+
+    for i in range(len(values)):
+        timestamp = datetime.strptime(timestamps[i], "%a, %d %b %Y %H:%M:%S %Z")
+        
         hour = timestamp.hour
-        hourly_sums[hour] += value
+        
+        hourly_sums[hour] += values[i]
+        
         hourly_counts[hour] += 1
-    
-    # Calculate the average value for each hour
-    hourly_avgs = [total / count if count > 0 else 0 for total, count in zip(hourly_sums, hourly_counts)]
+
+    hourly_avgs = [0] * 24
+
+    # Calculate the average for each hour
+    for i in range(24):
+        if hourly_counts[i] > 0:
+            hourly_avgs[i] = hourly_sums[i] / hourly_counts[i]
+
+    return hourly_avgs
     
     return hourly_avgs
-def plot_data_per_device(data):
-    """Generate a matplotlib figure with plots for each device and measurement."""
+def plot_data_per_device(data, plot_type):
     measurement_types = ['freq', 'phAngle', 'power', 'reacPower', 'rmsCur', 'rmsVolt']
     devices = list(data.keys())
     
-    fig, axs = plt.subplots(len(devices), len(measurement_types), figsize=(25, 4 * len(devices)))
-    axs = axs.reshape(len(devices), -1) if len(devices) > 1 else axs.reshape(1, -1)
-    
+    num_devices = len(devices)
+    num_measures = len(measurement_types)
+
+    fig, axs = plt.subplots(num_devices, num_measures, figsize=(25, 4 * num_devices))
+
+    # Ensure axs is always a 2D array
+    axs = np.atleast_2d(axs)
     for device_index, device in enumerate(devices):
         for measure_index, measure in enumerate(measurement_types):
             if measure in data[device]:
                 avg_data = get_average_per_hour(data[device][measure], data[device]['timestamp'])
                 
-                axs[device_index, measure_index].plot(avg_data)
+                if plot_type == 'Line graph':
+                    axs[device_index, measure_index].plot(avg_data)
+                if plot_type == 'Bar graph':
+                    axs[device_index, measure_index].bar(range(24), avg_data)
+                if plot_type == 'Pie chart':
+                    axs[device_index, measure_index].pie(avg_data)
+                if plot_type == 'Violin graph':
+                    axs[device_index, measure_index].violinplot(avg_data)
+                if plot_type == 'Scatter graph':
+                    axs[device_index, measure_index].scatter(range(24), avg_data)
+
                 axs[device_index, measure_index].set_title(f'{device} - {measure}')
                 axs[device_index, measure_index].set_xlabel('Hour of the Day')
                 axs[device_index, measure_index].set_ylabel(measure.capitalize())
@@ -63,7 +78,6 @@ def plot_data_per_device(data):
     return fig
 
 def handle_combined_input(appliances, start_datetime, end_datetime, graph_type, num_graphs):
-    """Handle the combined input for graphing functionality."""
     url = os.environ.get('Logic_API_URL_CSV')
 
     start_datetime_str = datetime.fromtimestamp(start_datetime).strftime("%Y-%m-%d %H:%M:%S")
@@ -89,7 +103,8 @@ def handle_combined_input(appliances, start_datetime, end_datetime, graph_type, 
     if response.status_code == 200:
         try:
             data = response.json()['data']
-            fig = plot_data_per_device(data)
+            plot_type = response.json().get('graph_type')
+            fig = plot_data_per_device(data , plot_type)
             return fig
         except json.JSONDecodeError:
             return "Error: Invalid JSON response from the server."
@@ -99,7 +114,6 @@ def handle_combined_input(appliances, start_datetime, end_datetime, graph_type, 
         return f"Error: API request failed with status code {response.status_code}"
 
 def predict(real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle, single_datetime):
-    """Handle the prediction functionality."""
     url = os.environ.get('Logic_API_URL_AI')
 
     dt_object = datetime.fromtimestamp(single_datetime)
@@ -123,11 +137,9 @@ def predict(real_power, reactive_power, rms_current, frequency, rms_voltage, pha
     return response.text
 
 def update_dropdown_visibility(num):
-    """Update the visibility of appliance dropdowns based on the number of graphs selected."""
     return [gr.update(visible=i < num) for i in range(MAX_GRAPHS)]
 
 def gather_inputs(num, *args):
-    """Gather inputs from the UI and call the handle_combined_input function."""
     appliances = [arg for arg in args[:num] if arg] 
     start_dt, end_dt, graph_type = args[-3:]
     return handle_combined_input(appliances, start_dt, end_dt, graph_type, num)
