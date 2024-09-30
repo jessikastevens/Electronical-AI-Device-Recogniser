@@ -17,27 +17,18 @@ DEFAULT_START_DATETIME = "2001-01-01 01:05:19"
 DEFAULT_END_DATETIME = "2014-02-13 12:48:20"
 
 def get_average_per_hour(values, timestamps):
-    """Get average hourly values for a list of values."""
-    # Convert timestamps to datetime objects
-    timestamps = [datetime.strptime(ts, "%a, %d %b %Y %H:%M:%S %Z") for ts in timestamps]
-    
-    # Initialize a list to store the sum of the values for each hour and a count of the number of values
     hourly_sums = [0] * 24
     hourly_counts = [0] * 24
-    
-    # Iterate over the values and their corresponding timestamps
-    for value, timestamp in zip(values, timestamps):
-        # Add the value to the sum for the corresponding hour and increment the count
+
+    for i in range(len(values)):
+        timestamp = datetime.strptime(timestamps[i], "%a, %d %b %Y %H:%M:%S %Z")
         hour = timestamp.hour
-        
         hourly_sums[hour] += values[i]
-        
         hourly_counts[hour] += 1
-    
-    # Calculate the average value for each hour
-    hourly_avgs = [total / count if count > 0 else 0 for total, count in zip(hourly_sums, hourly_counts)]
-    
+
+    hourly_avgs = [hourly_sums[i] / hourly_counts[i] if hourly_counts[i] > 0 else 0 for i in range(24)]
     return hourly_avgs
+
 def plot_data_per_device(data, plot_type):
     measurement_types = ['freq', 'phAngle', 'power', 'reacPower', 'rmsCur', 'rmsVolt']
     devices = list(data.keys())
@@ -111,38 +102,6 @@ def handle_combined_input(appliances, start_datetime, end_datetime, graph_type, 
     else:
         return f"Error: API request failed with status code {response.status_code}"
 
-def plot_prediction_data(real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle):
-    # Define the labels for each feature
-    labels = ['Real Power (W)', 'Reactive Power (var)', 'RMS Current (A)', 'Frequency (Hz)', 'RMS Voltage (V)', 'Phase Angle (φ)']
-    values = [real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle]
-    
-    # Create a bar graph
-    fig, ax = plt.subplots(figsize=(10, 6))
-    
-    ax.bar(labels, values, color=['blue', 'orange', 'green', 'red', 'purple', 'brown'])
-    
-    # Set titles and labels
-    ax.set_title('Device Parameters Bar Graph')
-    ax.set_ylabel('Values')
-    
-    # Rotate labels for better readability
-    plt.xticks(rotation=45, ha='right')
-
-    # Adjust layout to avoid label cutoff
-    plt.tight_layout()
-    
-    return fig
-
-# Updated prediction function to return both prediction and graph
-def predict_with_graph(real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle, single_datetime):
-    # Get the prediction
-    prediction = predict(real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle, single_datetime)
-    
-    # Generate the bar graph
-    fig = plot_prediction_data(real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle)
-    
-    return prediction, fig
-
 def predict(real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle, single_datetime):
     url = os.environ.get('Logic_API_URL_AI')
 
@@ -164,7 +123,38 @@ def predict(real_power, reactive_power, rms_current, frequency, rms_voltage, pha
     headers = {"Content-Type": "application/json"}
     response = requests.post(url, json=payload, headers=headers)
 
-    return response.text
+    if response.status_code == 200:
+        data = response.json()
+        predicted_appliance = data.get('predicted_appliance', 'Unknown')
+        fig = predict_graph(data)
+        return f"Predicted Appliance: {predicted_appliance}", fig
+    else:
+        error_message = f"Error: API request failed with status code {response.status_code}"
+        return error_message, None
+
+def predict_graph(data):
+    predictions = data['raw_predictions']
+    
+    appliances = list(predictions.keys())
+    probabilities = list(predictions.values())
+    
+    fig, ax = plt.subplots(figsize=(12, 6))
+    bars = ax.bar(appliances, probabilities)
+    
+    ax.set_title('Appliance Prediction Probabilities')
+    ax.set_xlabel('Appliances')
+    ax.set_ylabel('Probability')
+    plt.xticks(rotation=45, ha='right')
+    
+    predicted_appliance = data['predicted_appliance']
+    predicted_index = appliances.index(predicted_appliance)
+    bars[predicted_index].set_color('green')
+    
+    # ax.text(predicted_index, probabilities[predicted_index], 'Predicted', 
+    #         ha='center', va='bottom', color='green')
+    
+    plt.tight_layout()
+    return fig
 
 def update_dropdown_visibility(num):
     return [gr.update(visible=i < num) for i in range(MAX_GRAPHS)]
@@ -212,15 +202,14 @@ with gr.Blocks(theme="monochrome") as demo:
                 single_datetime = gr.DateTime(label="Select a Date and Time")
                 predict_button = gr.Button("Predict")
 
-        predict_output = gr.Textbox(label="Prediction Output")
-        graph_output = gr.Plot(label="Graph Output")
+        predict_output_text = gr.Textbox(label="Prediction Result")
+        predict_output = gr.Plot(label="Prediction Probabilities")
 
-        # Modify the click event to return both the prediction text and bar graph
         predict_button.click(
-            fn=predict_with_graph,
+            fn=predict,
             inputs=[real_power_slider, reactive_power_slider, rms_current_slider, frequency_slider,
                     rms_voltage_slider, phase_angle_slider, single_datetime],
-            outputs=[predict_output, graph_output]
+            outputs=[predict_output_text, predict_output]
         )
 
 if __name__ == "__main__":
