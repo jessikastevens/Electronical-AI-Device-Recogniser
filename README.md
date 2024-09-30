@@ -22,7 +22,7 @@ This project uses machine learning to identify electronic devices based on user 
 
 
 ## Sources
-- [Ai Dataset](https://icosys.ch/acs-f2#:~:text=ACS-F2%20is%20the%20second%20version%20of%20a%20database%20of%20electricity)
+- [Ai Dataset](https://ieeexplore.ieee.org/document/7007996)
   
 ## License
 This project is licensed under the MIT License.
