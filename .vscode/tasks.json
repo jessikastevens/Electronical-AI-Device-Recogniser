@@ -1,0 +1,46 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Run AIAPI",
+        "type": "shell",
+        "command": "python",
+        "args": ["khanya/AIAPI/Api.py"],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "presentation": {
+          "panel": "dedicated"
+        }
+      },
+      {
+        "label": "Run Jess",
+        "type": "shell",
+        "command": "python",
+        "args": ["Jess/main.py"],
+        "presentation": {
+          "panel": "dedicated"
+        }
+      },
+      {
+        "label": "Run LogicAPI",
+        "type": "shell",
+        "command": "python",
+        "args": ["Theo/Logic/LogicAPI.py"],
+        "presentation": {
+          "panel": "dedicated"
+        }
+      },
+      {
+        "label": "Run CSVAPI",
+        "type": "shell",
+        "command": "python",
+        "args": ["Theo/CSV/CSVAPI.py"],
+        "presentation": {
+          "panel": "dedicated"
+        }
+      }
+    ]
+  }
+  
