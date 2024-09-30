@@ -103,6 +103,44 @@ def handle_combined_input(appliances, start_datetime, end_datetime, graph_type, 
     else:
         return f"Error: API request failed with status code {response.status_code}"
 
+def plot_prediction_data(real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle):
+    # Create a figure with subplots
+    fig, axs = plt.subplots(2, 3, figsize=(15, 10))
+
+    # Plot each slider's data
+    axs[0, 0].bar(['Real Power'], [real_power])
+    axs[0, 0].set_title('Real Power (W)')
+    
+    axs[0, 1].bar(['Reactive Power'], [reactive_power])
+    axs[0, 1].set_title('Reactive Power (var)')
+    
+    axs[0, 2].bar(['RMS Current'], [rms_current])
+    axs[0, 2].set_title('RMS Current (A)')
+    
+    axs[1, 0].bar(['Frequency'], [frequency])
+    axs[1, 0].set_title('Frequency (Hz)')
+    
+    axs[1, 1].bar(['RMS Voltage'], [rms_voltage])
+    axs[1, 1].set_title('RMS Voltage (V)')
+    
+    axs[1, 2].bar(['Phase Angle'], [phase_angle])
+    axs[1, 2].set_title('Phase Angle (φ)')
+    
+    # Adjust the layout
+    plt.tight_layout()
+    
+    return fig
+
+# Updated prediction function to return both prediction and graph
+def predict_with_graph(real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle, single_datetime):
+    # Get the prediction
+    prediction = predict(real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle, single_datetime)
+    
+    # Generate the graph
+    fig = plot_prediction_data(real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle)
+    
+    return prediction, fig
+
 def predict(real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle, single_datetime):
     url = os.environ.get('Logic_API_URL_AI')
 
