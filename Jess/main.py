@@ -104,29 +104,23 @@ def handle_combined_input(appliances, start_datetime, end_datetime, graph_type, 
         return f"Error: API request failed with status code {response.status_code}"
 
 def plot_prediction_data(real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle):
-    # Create a figure with subplots
-    fig, axs = plt.subplots(2, 3, figsize=(15, 10))
+    # Define the labels for each feature
+    labels = ['Real Power (W)', 'Reactive Power (var)', 'RMS Current (A)', 'Frequency (Hz)', 'RMS Voltage (V)', 'Phase Angle (φ)']
+    values = [real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle]
+    
+    # Create a bar graph
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    ax.bar(labels, values, color=['blue', 'orange', 'green', 'red', 'purple', 'brown'])
+    
+    # Set titles and labels
+    ax.set_title('Device Parameters Bar Graph')
+    ax.set_ylabel('Values')
+    
+    # Rotate labels for better readability
+    plt.xticks(rotation=45, ha='right')
 
-    # Plot each slider's data
-    axs[0, 0].bar(['Real Power'], [real_power])
-    axs[0, 0].set_title('Real Power (W)')
-    
-    axs[0, 1].bar(['Reactive Power'], [reactive_power])
-    axs[0, 1].set_title('Reactive Power (var)')
-    
-    axs[0, 2].bar(['RMS Current'], [rms_current])
-    axs[0, 2].set_title('RMS Current (A)')
-    
-    axs[1, 0].bar(['Frequency'], [frequency])
-    axs[1, 0].set_title('Frequency (Hz)')
-    
-    axs[1, 1].bar(['RMS Voltage'], [rms_voltage])
-    axs[1, 1].set_title('RMS Voltage (V)')
-    
-    axs[1, 2].bar(['Phase Angle'], [phase_angle])
-    axs[1, 2].set_title('Phase Angle (φ)')
-    
-    # Adjust the layout
+    # Adjust layout to avoid label cutoff
     plt.tight_layout()
     
     return fig
@@ -136,7 +130,7 @@ def predict_with_graph(real_power, reactive_power, rms_current, frequency, rms_v
     # Get the prediction
     prediction = predict(real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle, single_datetime)
     
-    # Generate the graph
+    # Generate the bar graph
     fig = plot_prediction_data(real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle)
     
     return prediction, fig
@@ -211,12 +205,14 @@ with gr.Blocks(theme="monochrome") as demo:
                 predict_button = gr.Button("Predict")
 
         predict_output = gr.Textbox(label="Prediction Output")
+        graph_output = gr.Plot(label="Graph Output")
 
+        # Modify the click event to return both the prediction text and bar graph
         predict_button.click(
-            fn=predict,
+            fn=predict_with_graph,
             inputs=[real_power_slider, reactive_power_slider, rms_current_slider, frequency_slider,
                     rms_voltage_slider, phase_angle_slider, single_datetime],
-            outputs=[predict_output]
+            outputs=[predict_output, graph_output]
         )
 
 if __name__ == "__main__":
