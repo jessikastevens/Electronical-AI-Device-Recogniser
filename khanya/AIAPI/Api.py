@@ -2,11 +2,20 @@
 import numpy as np
 from flask import Flask, jsonify, request
 from tensorflow.keras.models import load_model
+import joblib
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
+MODEL_PATH = os.getenv('MODEL_PATH')  # Fetch MODEL_PATH from .env
+SCALER_PATH = os.getenv('SCALER_PATH')  # Fetch SCALER_PATH from .env
 app = Flask(__name__)
 
 # Load the model once when the API starts to avoid reloading it on every request
-model = load_model(r'khanya\AIAPI\appliance_recogniser#3.keras')
+model = load_model(MODEL_PATH)
+
+# Load the scaler
+scaler = joblib.load(SCALER_PATH)
 
 @app.route('/', methods=['POST'])
 def api():
@@ -37,6 +46,9 @@ def api():
 
     # Convert the list to a numpy array and reshape to the correct format for the model
     input_data = np.array(input_list).reshape((1, -1))
+
+    # Scale the input data
+    input_data = scaler.transform(input_data)
 
     # Make a prediction using the loaded model
     raw_prediction = model.predict(input_data)[0]

@@ -17,16 +17,24 @@ DEFAULT_START_DATETIME = "2001-01-01 01:05:19"
 DEFAULT_END_DATETIME = "2014-02-13 12:48:20"
 
 def get_average_per_hour(values, timestamps):
+    """Get average hourly values for a list of values."""
+    # Convert timestamps to datetime objects
     timestamps = [datetime.strptime(ts, "%a, %d %b %Y %H:%M:%S %Z") for ts in timestamps]
     
+    # Initialize a list to store the sum of the values for each hour and a count of the number of values
     hourly_sums = [0] * 24
     hourly_counts = [0] * 24
     
+    # Iterate over the values and their corresponding timestamps
     for value, timestamp in zip(values, timestamps):
+        # Add the value to the sum for the corresponding hour and increment the count
         hour = timestamp.hour
-        hourly_sums[hour] += value
+        
+        hourly_sums[hour] += values[i]
+        
         hourly_counts[hour] += 1
     
+    # Calculate the average value for each hour
     hourly_avgs = [total / count if count > 0 else 0 for total, count in zip(hourly_sums, hourly_counts)]
     
     return hourly_avgs
