@@ -17,17 +17,27 @@ DEFAULT_START_DATETIME = "2001-01-01 01:05:19"
 DEFAULT_END_DATETIME = "2014-02-13 12:48:20"
 
 def get_average_per_hour(values, timestamps):
-    timestamps = [datetime.strptime(ts, "%a, %d %b %Y %H:%M:%S %Z") for ts in timestamps]
-    
+    # Initialize lists to hold sums and counts for each hour
     hourly_sums = [0] * 24
     hourly_counts = [0] * 24
-    
-    for value, timestamp in zip(values, timestamps):
+
+    for i in range(len(values)):
+        timestamp = datetime.strptime(timestamps[i], "%a, %d %b %Y %H:%M:%S %Z")
+        
         hour = timestamp.hour
-        hourly_sums[hour] += value
+        
+        hourly_sums[hour] += values[i]
+        
         hourly_counts[hour] += 1
-    
-    hourly_avgs = [total / count if count > 0 else 0 for total, count in zip(hourly_sums, hourly_counts)]
+
+    hourly_avgs = [0] * 24
+
+    # Calculate the average for each hour
+    for i in range(24):
+        if hourly_counts[i] > 0:
+            hourly_avgs[i] = hourly_sums[i] / hourly_counts[i]
+
+    return hourly_avgs
     
     return hourly_avgs
 def plot_data_per_device(data, plot_type):
