@@ -9,9 +9,7 @@ import numpy as np
 
 load_dotenv()
 
-# Constants
-OPTIONS_1 = ['Fridges & Freezers', 'TVs', 'Hi-Fi systems (with CD players)', 'Laptops', 'Computer stations', 'Incandescent lamps',
-             'Compact fluorescent lamps', 'Microwaves', 'Coffee machines', 'Mobile phones', 'Printers']
+OPTIONS_1 = ['Fridges & Freezers', 'TVs', 'Hi-Fi systems (with CD players)', 'Laptops', 'Computer stations', 'Incandescent lamps',             'Compact fluorescent lamps', 'Microwaves', 'Coffee machines', 'Mobile phones', 'Printers']
 OPTIONS_2 = ['Line graph', 'Bar graph', 'Pie chart', 'Scatter graph', 'Violin graph']
 OPTIONS_3 = [i for i in range(1, 11)]
 MAX_GRAPHS = 10
@@ -19,7 +17,6 @@ DEFAULT_START_DATETIME = "2001-01-01 01:05:19"
 DEFAULT_END_DATETIME = "2014-02-13 12:48:20"
 
 def get_average_per_hour(values, timestamps):
-    """Get average hourly values for a list of values."""
     timestamps = [datetime.strptime(ts, "%a, %d %b %Y %H:%M:%S %Z") for ts in timestamps]
     
     hourly_sums = [0] * 24
@@ -34,7 +31,6 @@ def get_average_per_hour(values, timestamps):
     
     return hourly_avgs
 def plot_data_per_device(data, plot_type):
-    """Generate a matplotlib figure with plots for each device and measurement."""
     measurement_types = ['freq', 'phAngle', 'power', 'reacPower', 'rmsCur', 'rmsVolt']
     devices = list(data.keys())
     
@@ -72,7 +68,6 @@ def plot_data_per_device(data, plot_type):
     return fig
 
 def handle_combined_input(appliances, start_datetime, end_datetime, graph_type, num_graphs):
-    """Handle the combined input for graphing functionality."""
     url = os.environ.get('Logic_API_URL_CSV')
 
     start_datetime_str = datetime.fromtimestamp(start_datetime).strftime("%Y-%m-%d %H:%M:%S")
@@ -109,7 +104,6 @@ def handle_combined_input(appliances, start_datetime, end_datetime, graph_type, 
         return f"Error: API request failed with status code {response.status_code}"
 
 def predict(real_power, reactive_power, rms_current, frequency, rms_voltage, phase_angle, single_datetime):
-    """Handle the prediction functionality."""
     url = os.environ.get('Logic_API_URL_AI')
 
     dt_object = datetime.fromtimestamp(single_datetime)
@@ -133,11 +127,9 @@ def predict(real_power, reactive_power, rms_current, frequency, rms_voltage, pha
     return response.text
 
 def update_dropdown_visibility(num):
-    """Update the visibility of appliance dropdowns based on the number of graphs selected."""
     return [gr.update(visible=i < num) for i in range(MAX_GRAPHS)]
 
 def gather_inputs(num, *args):
-    """Gather inputs from the UI and call the handle_combined_input function."""
     appliances = [arg for arg in args[:num] if arg] 
     start_dt, end_dt, graph_type = args[-3:]
     return handle_combined_input(appliances, start_dt, end_dt, graph_type, num)
