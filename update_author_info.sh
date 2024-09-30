@@ -1,4 +1,4 @@
-git filter-branch --env-filter '
+git filter-branch -f --env-filter '
 if [ "$GIT_AUTHOR_NAME" = "23kngightst813" ];
 then
     GIT_AUTHOR_NAME="23knightst813";
