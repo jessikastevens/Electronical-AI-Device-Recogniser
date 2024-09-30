@@ -11,9 +11,9 @@ This project uses machine learning to identify electronic devices based on user 
 
 
 ## Contributors
-- [jessikastevens](https://github.com/jessikastevens)
-- [Theo](https://github.com/23knightst813)
-- [Khanya](https://github.com/khanya-mcfadden)
+- [Jessika Stevens](https://github.com/jessikastevens)
+- [Theo Knights](https://github.com/23knightst813)
+- [Khanya Malgas-Mcfadden](https://github.com/khanya-mcfadden)
 
 ## License
 This project is licensed under the MIT License.
