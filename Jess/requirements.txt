@@ -1,13 +1,6 @@
 gunicorn
-
 python-dotenv
-
 gradio
-
 matplotlib
-
 requests
-
-python-dotenv
-
 numpy
