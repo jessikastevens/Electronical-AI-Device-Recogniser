@@ -5,6 +5,7 @@ from tensorflow.keras.models import load_model
 import joblib
 from dotenv import load_dotenv
 import os
+
 load_dotenv()
 MODEL_PATH = os.getenv('MODEL_PATH', 'model.h5')
 SCALER_PATH = os.getenv('SCALER_PATH', 'scaler.pkl')
