@@ -1,4 +1,4 @@
-
+# syntax=docker/dockerfile:1
 
 # Comments are provided throughout this file to help you get started.
 # If you need more help, visit the Dockerfile reference guide at
@@ -6,17 +6,42 @@
 
 # Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
 
-ARG PYTHON_VERSION=3.12.6
-FROM python:${PYTHON_VERSION}-slim as base
+################################################################################
+# Pick a base image to serve as the foundation for the other build stages in
+# this file.
+#
+# For illustrative purposes, the following FROM command
+# is using the alpine image (see https://hub.docker.com/_/alpine).
+# By specifying the "latest" tag, it will also use whatever happens to be the
+# most recent version of that image when you build your Dockerfile.
+# If reproducability is important, consider using a versioned tag
+# (e.g., alpine:3.17.2) or SHA (e.g., alpine@sha256:c41ab5c992deb4fe7e5da09f67a8804a46bd0592bfdf0b1847dde0e0889d2bff).
+FROM alpine:latest as base
 
-# Prevents Python from writing pyc files.
-ENV PYTHONDONTWRITEBYTECODE=1
+################################################################################
+# Create a stage for building/compiling the application.
+#
+# The following commands will leverage the "base" stage above to generate
+# a "hello world" script and make it executable, but for a real application, you
+# would issue a RUN command for your application's build process to generate the
+# executable. For language-specific examples, take a look at the Dockerfiles in
+# the Awesome Compose repository: https://github.com/docker/awesome-compose
+FROM base as build
+RUN echo -e '#!/bin/sh\n\
+echo Hello world from $(whoami)! In order to get your application running in a container, take a look at the comments in the Dockerfile to get started.'\
+> /bin/hello.sh
+RUN chmod +x /bin/hello.sh
 
-# Keeps Python from buffering stdout and stderr to avoid situations where
-# the application crashes without emitting any logs due to buffering.
-ENV PYTHONUNBUFFERED=1
-
-WORKDIR /app
+################################################################################
+# Create a final stage for running your application.
+#
+# The following commands copy the output from the "build" stage above and tell
+# the container runtime to execute it when the image is run. Ideally this stage
+# contains the minimal runtime dependencies for the application as to produce
+# the smallest image possible. This often means using a different and smaller
+# image than the one used for building the application, but for illustrative
+# purposes the "base" image is used here.
+FROM base AS final
 
 # Create a non-privileged user that the app will run under.
 # See https://docs.docker.com/go/dockerfile-user-best-practices/
@@ -29,23 +54,10 @@ RUN adduser \
     --no-create-home \
     --uid "${UID}" \
     appuser
-
-# Download dependencies as a separate step to take advantage of Docker's caching.
-# Leverage a cache mount to /root/.cache/pip to speed up subsequent builds.
-# Leverage a bind mount to requirements.txt to avoid having to copy them into
-# into this layer.
-RUN --mount=type=cache,target=/root/.cache/pip \
-    --mount=type=bind,source=requirements.txt,target=requirements.txt \
-    python -m pip install -r requirements.txt
-
-# Switch to the non-privileged user to run the application.
 USER appuser
 
-# Copy the source code into the container.
-COPY . .
+# Copy the executable from the "build" stage.
+COPY --from=build /bin/hello.sh /bin/
 
-# Expose the port that the application listens on.
-EXPOSE 8000
-
-# Run the application.
-CMD gunicorn 'Api:app' --bind=0.0.0.0:8000
+# What the container should run when it is started.
+ENTRYPOINT [ "/bin/hello.sh" ]
