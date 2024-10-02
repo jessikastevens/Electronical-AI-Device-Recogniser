@@ -22,4 +22,4 @@ COPY . /app/
 EXPOSE 8080
 
 # Set the command to run the Flask app (point to api.py)
-CMD ["python3", "api.py"]
+CMD ["python3", "Api.py"]
