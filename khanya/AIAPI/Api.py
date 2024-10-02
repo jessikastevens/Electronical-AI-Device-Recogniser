@@ -5,6 +5,7 @@ from tensorflow.keras.models import load_model
 import joblib
 from dotenv import load_dotenv
 import os
+
 load_dotenv()
 MODEL_PATH = os.getenv('MODEL_PATH', 'model.h5')
 SCALER_PATH = os.getenv('SCALER_PATH', 'scaler.pkl')
@@ -65,5 +66,6 @@ def api():
         "raw_prediction": raw_prediction.tolist()  # Convert numpy array to list
     })
 
-if __name__ == '__main__':
-    app.run(debug=True, port=6000)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8080))  # Use the PORT environment variable or default to 8080
+    app.run(host="0.0.0.0", port=port)  # Bind to all IP addresses (necessary for Cloud Run)
