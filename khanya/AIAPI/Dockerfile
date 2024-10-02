@@ -57,7 +57,10 @@ RUN adduser \
 USER appuser
 
 # Copy the executable from the "build" stage.
-COPY --from=build /bin/hello.sh /bin/
+COPY , .
+
+EXPOSE 8080
 
 # What the container should run when it is started.
-ENTRYPOINT [ "/bin/hello.sh" ]
+CMD ["python3", "aiapi.py"]
+

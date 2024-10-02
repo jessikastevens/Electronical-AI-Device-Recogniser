@@ -15,8 +15,11 @@ services:
     # If your application exposes a port, uncomment the following lines and change
     # the port numbers as needed. The first number is the host port and the second
     # is the port inside the container.
-    # ports:
-    #   - 8080:8080
+    ports:
+      - 8080:8080
+    environment:
+      - MODEL_PATH='appliance_recogniser1_1_2.keras'
+      - SCALER_PATH='scaler1_1_2.pkl'
 
     # The commented out section below is an example of how to define a PostgreSQL
     # database that your application can use. `depends_on` tells Docker Compose to
