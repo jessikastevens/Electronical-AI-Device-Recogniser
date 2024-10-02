@@ -1,7 +1,7 @@
 #!/bin/bash
 
 VERSION_FILE="version.txt"
-SERVICE=collyer-khanya-prediction-svc
+SERVICE=prediction-api
 PROJECTID=collyers-435813
 REPOID=collyers-main
 REGION=europe-west2
