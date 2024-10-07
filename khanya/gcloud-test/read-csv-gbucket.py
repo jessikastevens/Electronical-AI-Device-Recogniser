@@ -30,6 +30,6 @@ def get_csv_gcs(bucket_name, file_name, api_key_path):
 
 bucket_name = "collyers-main-bucket"
 file_name = "acs-f2-datasetOG.csv"
-api_key_path = 'gcloud-test/collyers-435813-5d45d9974b4f.json'
+api_key_path = 'gcloud-test\collyers-435813-9ddeafda4244.json'
 csv_data = get_csv_gcs(bucket_name, file_name, api_key_path)
 print(csv_data.head(5))
