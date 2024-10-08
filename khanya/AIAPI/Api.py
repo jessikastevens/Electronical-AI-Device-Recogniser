@@ -25,19 +25,7 @@ app = Flask(__name__)
 def api():
     data = request.get_json()
 
-    '''
-    Expected JSON format:
-    {
-        "Real Power": 100,
-        "Reactive Power": 50,
-        "RMS Current": 10,
-        "Frequency": 60,
-        "RMS Voltage": 220,
-        "Phase Angle": 30,
-        "Date": "2022-01-01",
-        "time": "12:00:00"
-    }
-    '''
+
     # Extract the relevant fields from the input data
     input_list = [
         data.get("Real Power", 0),

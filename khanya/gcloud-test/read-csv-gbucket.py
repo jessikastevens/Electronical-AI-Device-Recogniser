@@ -2,6 +2,8 @@ import google.auth
 from google.cloud import storage
 import pandas as pd
 import os
+import io
+
 #requirements.txt
 # google-cloud-storage==1.30.0
 # gcsfs==0.6.2   pip3 install gcsfs
@@ -25,11 +27,11 @@ def get_csv_gcs(bucket_name, file_name, api_key_path):
     csv_data = blob.download_as_string()
     
     # Read the CSV data into a pandas DataFrame
-    df = pd.read_csv(pd.compat.StringIO(csv_data.decode('utf-8')))
+    df = pd.read_csv(io.StringIO(csv_data.decode('utf-8')))
     return df
 
 bucket_name = "collyers-main-bucket"
 file_name = "acs-f2-datasetOG.csv"
-api_key_path = 'gcloud-test\collyers-435813-9ddeafda4244.json'
+api_key_path = "khanya/gcloud-test/collyers-435813-9ddeafda4244.json"
 csv_data = get_csv_gcs(bucket_name, file_name, api_key_path)
 print(csv_data.head(5))
