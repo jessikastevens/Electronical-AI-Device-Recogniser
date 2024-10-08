@@ -51,8 +51,6 @@ APPLIANCE_TAGS = {
 }
 
 
-
-'''
 @app.route('/ai', methods=['POST'])
 def ai_route():
     try:
@@ -107,7 +105,6 @@ def ai_route():
     except Exception as e:
         logger.error(f"Unexpected error in AI route: {str(e)}")
         return jsonify({"error": "An unexpected error occurred"}), 500
-'''
 # @app.route('/csv', methods=['POST'])
 @app.route('/', methods=['POST'])
 def csv_route():
@@ -142,6 +139,6 @@ def csv_route():
         return jsonify({"error": "An unexpected error occurred"}), 500
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 8080))
+    port = int(os.environ.get('PORT', 5000))
     logger.info(f"Starting application on port {port}")
-    app.run(host='0.0.0.0', port=port)
+    app.run(port=port)

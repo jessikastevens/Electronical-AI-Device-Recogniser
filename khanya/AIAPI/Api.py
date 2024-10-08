@@ -67,5 +67,5 @@ def api():
     })
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8080))  # Use the PORT environment variable or default to 8080
-    app.run(host="0.0.0.0", port=port)  # Bind to all IP addresses (necessary for Cloud Run)
+    port = int(os.environ.get("PORT", 6000))  # Use the PORT environment variable or default to 8080
+    app.run(port=port)  # Bind to all IP addresses (necessary for Cloud Run)

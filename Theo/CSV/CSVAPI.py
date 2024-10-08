@@ -4,6 +4,9 @@ import os
 import requests
 from io import StringIO
 import logging
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -54,7 +57,7 @@ def api():
         graph_type = request_data['graph_type']
         num_graphs = request_data['num_graphs']
 
-        csv_url = os.getenv('CSV_FILE_PATH', 'https://raw.githubusercontent.com/jessikastevens/Electronical-AI-Device-Recogniser/refs/heads/main/Theo/CSV/acs-f2-datasetOG.csv')
+        csv_url = os.getenv('CSV_FILE_PATH')
         
         df = stream_csv(csv_url)
         
@@ -94,6 +97,6 @@ def api():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 8080))
+    port = int(os.environ.get('PORT', 7000))
     logger.info(f"Starting application on port {port}")
-    app.run(host='0.0.0.0', port=port)
+    app.run( port=port)
