@@ -24,24 +24,28 @@ MAX_GRAPHS = 10
 DEFAULT_START_DATETIME = "2001-01-01 01:05:19"
 DEFAULT_END_DATETIME = "2014-02-13 12:48:20"
 
-def configure_model(api_key):
-    global model, chat  # Ensure chat is defined globally
 
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-1.5-flash")
 
-    # Initialize the chat object
-    chat = model.start_chat(
-        history=[
+def validate_gemini_api_key(api_key):
+    global model, chat
+
+    try:
+        genai.configure(api_key=api_key)
+
+        model = genai.GenerativeModel("gemini-1.5-pro")
+
+        response = model.generate_content(f'hi')
+
+        chat = model.start_chat(history=[
             {"role": "user", "parts": "Hello"},
             {"role": "model", "parts": "Great to meet you. What would you like to know?"}
-        ]
-    )
-    try:
-        models = client.list_models()
-        print("API key is working. Available models:", models)
-    except Exception as e:
-        print("API key is not working. Error:", e)
+        ])
+
+        return 'API KEY VALID'
+
+    except:
+        return 'API KEY INVALID'
+
 
 
 def get_average_per_hour(values, timestamps):
@@ -66,6 +70,8 @@ def plot_data_per_device(data, plot_type, chat_history):
 
     fig, axs = plt.subplots(num_devices, num_measures, figsize=(25, 4 * num_devices))
     axs = np.atleast_2d(axs)
+
+    plt.subplots_adjust(hspace=0.4, wspace=0.4)
 
     raw_data_text = "Raw Data:\n"
 
@@ -244,6 +250,9 @@ Clear Chat Button: Clears the conversation history.
 Graph Output Area: Displays the generated graph based on the user’s selection.
 Note: The UI is designed for simplicity and efficiency, helping users visualise data easily while offering interactive AI support.
 If the user inputs multiple devices and asks about one of them seperatly still give them more infomation, dont ask them to sumbit the form again unless theres is no data AT ALL on the device the user is asking about
+if the user asks for json chatlog give it to them with all the contect of the chat you know inside
+in the previous message the user should of sent you some raw data, keep that in mind and target your response at that data
+never ask the user to resumit data unless the whole history doesnt contain any data on the subject
 
 '''
     question = f'Your Personality is {personality}. The user\'s message is "{message}"'
@@ -263,10 +272,12 @@ button:active {
 with gr.Blocks(css=css, theme="monochrome") as demo:
     # API Key input and setup
     with gr.Row():
-        api_key_input = gr.Textbox(label="Enter your Gemini API Key", type="text")
-        api_key_button = gr.Button("Set API Key")
-    
-    api_key_button.click(fn=configure_model, inputs=api_key_input, outputs="")
+        api_key_input = gr.Textbox(label="Enter your Gemini API Key", type="text", info=" Only Needed for ai chat ")
+        output_text = gr.Textbox(label="Validation Status",info=r'ㅤ', interactive=False) 
+        submit_button = gr.Button("Submit")
+
+        submit_button.click(validate_gemini_api_key, inputs=[api_key_input], outputs=[output_text])
+
 
     with gr.Tab("View Data"):
         with gr.Row():
@@ -324,5 +335,6 @@ with gr.Blocks(css=css, theme="monochrome") as demo:
             outputs=[predict_output_text, predict_output]
         )
 
-demo.launch()
-
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8080))
+    demo.launch(server_port=port, server_name="0.0.0.0")
