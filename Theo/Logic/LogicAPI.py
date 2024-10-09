@@ -105,7 +105,6 @@ def ai_route():
     except Exception as e:
         logger.error(f"Unexpected error in AI route: {str(e)}")
         return jsonify({"error": "An unexpected error occurred"}), 500
-'''
 # @app.route('/csv', methods=['POST'])
 @app.route('/', methods=['POST'])
 def csv_route():
