@@ -1,0 +1,5 @@
+# Set the repository language to Python
+*.py linguist-language=Python
+
+# Ignore Jupyter Notebook files
+*.ipynb linguist-hide
