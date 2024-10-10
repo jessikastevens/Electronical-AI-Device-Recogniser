@@ -269,14 +269,18 @@ button:active {
 }
 """
 
-with gr.Blocks(css=css, theme="monochrome") as demo:
-    # API Key input and setup
+theme_choice = os.environ.get('THEME')
+
+with gr.Blocks(css=css, theme=theme_choice) as demo:
     with gr.Row():
-        api_key_input = gr.Textbox(label="Enter your Gemini API Key", type="text", info=" Only Needed for ai chat ")
-        output_text = gr.Textbox(label="Validation Status",info=r'ㅤ', interactive=False) 
+        api_key_input = gr.Textbox(label="Enter your Gemini API Key", type="text", info="Only Needed for AI chat")
+        output_text = gr.Textbox(label="Validation Status", info=r'If the api key works', interactive=False) 
+
+    with gr.Row():
         submit_button = gr.Button("Submit")
 
-        submit_button.click(validate_gemini_api_key, inputs=[api_key_input], outputs=[output_text])
+    submit_button.click(validate_gemini_api_key, inputs=[api_key_input], outputs=[output_text])
+
 
 
     with gr.Tab("View Data"):
@@ -337,4 +341,4 @@ with gr.Blocks(css=css, theme="monochrome") as demo:
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
-    demo.launch(server_port=port, server_name="0.0.0.0")
+    demo.launch(server_port=port)
