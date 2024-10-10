@@ -1,0 +1,52 @@
+from tensorflow.keras.layers import Input, Concatenate, Multiply
+from tensorflow.keras import backend as K
+from tensorflow.keras.callbacks import TensorBoard
+import datetime
+
+# Define the model architecture with weighted inputs and dropout
+input_layer = Input(shape=(X_train.shape[1],))
+
+# Define weights for each input feature
+weights = K.constant([[4.0, 2.0, 1.5, 1.0, 0.5, 0.2]])  # Adjust these weights as needed
+
+# Apply the weights to the input features
+weighted_inputs = Multiply()([input_layer, weights])
+
+# Define the rest of the model
+x = Dense(128, activation='relu')(weighted_inputs)
+x = Dropout(0.3)(x)
+x = Dense(128, activation='relu')(x)
+x = Dropout(0.3)(x)
+x = Dense(128, activation='relu')(x)
+x = Dropout(0.3)(x)
+x = Dense(64, activation='relu')(x)
+num_classes = y_resampled_onehot.shape[1]
+output_layer = Dense(num_classes, activation='softmax')(x)
+model = tf.keras.Model(inputs=input_layer, outputs=output_layer)
+
+# Compile the model with a lower learning rate for better generalization
+initial_learning_rate = 0.0005
+lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+    initial_learning_rate,
+    decay_steps=10000,
+    decay_rate=0.96,
+    staircase=True
+)
+
+model.compile(optimizer=Adam(learning_rate=lr_schedule), 
+              loss='categorical_crossentropy', 
+              metrics=['accuracy'])
+
+# Early stopping to prevent overfitting
+early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
+
+# TensorBoard callback
+log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
+
+# Train the model with early stopping and TensorBoard callback
+history = model.fit(X_train, y_train, 
+                    validation_data=(X_test, y_test),
+                    epochs=100, 
+                    batch_size=64, 
+                    callbacks=[early_stopping, tensorboard_callback])
