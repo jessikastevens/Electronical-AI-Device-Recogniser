@@ -270,10 +270,11 @@ button:active {
 """
 
 theme_choice = os.environ.get('THEME')
+DEFULT_API_KEY = os.environ.get('DEFULT_API_KEY')
 
 with gr.Blocks(css=css, theme=theme_choice) as demo:
     with gr.Row():
-        api_key_input = gr.Textbox(label="Enter your Gemini API Key", type="text", info="Only Needed for AI chat")
+        api_key_input = gr.Textbox(label="Enter your Gemini API Key", value=DEFULT_API_KEY, type="text", info="Only Needed for AI chat")
         output_text = gr.Textbox(label="Validation Status", info=r'If the api key works', interactive=False) 
 
     with gr.Row():
